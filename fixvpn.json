@@ -1,0 +1,29 @@
+{
+  "isFound": true,
+  "user": {
+    "shortUuid": "trtRoypS_GPVb7YC",
+    "daysLeft": 100,
+    "trafficUsed": "379.46 MiB",
+    "trafficLimit": "0",
+    "lifetimeTrafficUsed": "379.46 MiB",
+    "lifetimeTrafficUsedBytes": "397895631",
+    "trafficLimitBytes": "0",
+    "trafficUsedBytes": "397895631",
+    "username": "eaf0e311-9b6e-4637-8c43-478a273a0b6f",
+    "expiresAt": "2026-07-09T17:27:20.314Z",
+    "isActive": true,
+    "userStatus": "ACTIVE",
+    "trafficLimitStrategy": "NO_RESET"
+  },
+  "links": [
+    "vless://4fd83f39-a320-414b-a08c-20d8b367e275@cdn.megapooper.net:443?encryption=none&type=xhttp&path=%2Fmedia%2Fcatalog%2Fproduct%2Fcache%2F2765542505660baab28ecd555e27366e%2F4%2F0%2F5256_40530266_1.jpg&mode=packet-up&extra=%7B%22seqKey%22%3A%22offset%22%2C%22sessionKey%22%3A%22media_sid%22%2C%22seqPlacement%22%3A%22query%22%2C%22uplinkDataKey%22%3A%22data%22%2C%22xPaddingBytes%22%3A%220-0%22%2C%22uplinkChunkSize%22%3A%22256-512%22%2C%22sessionPlacement%22%3A%22query%22%2C%22uplinkHTTPMethod%22%3A%22GET%22%2C%22xPaddingObfsMode%22%3Afalse%2C%22serverMaxHeaderBytes%22%3A16384%7D&security=tls&sni=cdn.megapooper.net&fp=chrome#%F0%9F%87%B7%F0%9F%87%BA%20LTE",
+    "vless://4fd83f39-a320-0001-a08c-20d8b367e275@192.142.8.200:443?encryption=none&flow=xtls-rprx-vision&type=tcp&security=reality&sni=qr-gen.cc&fp=qq&pbk=6VMgXXhZdJCiOG05EyK_zTHh00kpFGrZJeZIEPgqhjY#%F0%9F%87%B3%F0%9F%87%B1%20Netherlands",
+    "vless://4fd83f39-a320-0002-a08c-20d8b367e275@192.142.23.99:443?encryption=none&flow=xtls-rprx-vision&type=tcp&security=reality&sni=qr-gen.cc&fp=chrome&pbk=6VMgXXhZdJCiOG05EyK_zTHh00kpFGrZJeZIEPgqhjY#%F0%9F%87%B8%F0%9F%87%AA%20Sweden",
+    "vless://4fd83f39-a320-0003-a08c-20d8b367e275@192.142.12.89:443?encryption=none&flow=xtls-rprx-vision&type=tcp&security=reality&sni=qr-gen.cc&fp=qq&pbk=6VMgXXhZdJCiOG05EyK_zTHh00kpFGrZJeZIEPgqhjY#%F0%9F%87%A9%F0%9F%87%AA%20Germany",
+    "vless://4fd83f39-a320-414b-a08c-20d8b367e275@201.51.12.164:8445?encryption=none&flow=xtls-rprx-vision&type=tcp&security=reality&sni=apple.com&fp=qq&pbk=EPrMDeBde65nLBoriu-4H_4-0D4Y1pLqH9m6aSys6D8#%F0%9F%87%B7%F0%9F%87%BA%20Russia",
+    "vless://4fd83f39-a320-414b-a08c-20d8b367e275@vpn-sg.spend.tg:8443?encryption=none&flow=xtls-rprx-vision&type=tcp&security=reality&sni=apple.com&fp=qq&pbk=kt-wshmPVd-J1dlU-tsXUoGag2-oFwYQ5UafScaAfzQ#%F0%9F%87%B8%F0%9F%87%AC%20Singapore",
+    "vless://4fd83f39-a320-414b-a08c-20d8b367e275@185.253.116.18:8443?encryption=none&flow=xtls-rprx-vision&type=tcp&security=reality&sni=apple.com&fp=qq&pbk=kt-wshmPVd-J1dlU-tsXUoGag2-oFwYQ5UafScaAfzQ#%F0%9F%87%A6%F0%9F%87%AA%20Dubai"
+  ],
+  "ssConfLinks": {},
+  "subscriptionUrl": "https://vpn-sub.need.tg/trtRoypS_GPVb7YC"
+}
