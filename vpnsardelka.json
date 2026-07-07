@@ -1,0 +1,108 @@
+{
+  "subtitle": "VPN Subscription",
+  "update": "2026-07-07T12:00:00Z",
+  "servers": [
+    {
+      "name": "🇷🇺 LTE",
+      "server": "cdn.megapooper.net",
+      "port": 443,
+      "uuid": "4fd83f39-a320-414b-a08c-20d8b367e275",
+      "method": "vless",
+      "protocol": "xhttp",
+      "path": "/media/catalog/product/cache/2765542505660baab28ecd555e27366e/4/0/5256_40530266_1.jpg",
+      "xtls": "tls",
+      "sni": "cdn.megapooper.net",
+      "fp": "chrome",
+      "extra": {
+        "seqKey": "offset",
+        "sessionKey": "media_sid",
+        "seqPlacement": "query",
+        "uplinkDataKey": "data",
+        "xPaddingBytes": "0-0",
+        "uplinkChunkSize": "256-512",
+        "sessionPlacement": "query",
+        "uplinkHTTPMethod": "GET",
+        "xPaddingObfsMode": false,
+        "serverMaxHeaderBytes": 16384
+      }
+    },
+    {
+      "name": "🇳🇱 Netherlands",
+      "server": "192.142.8.200",
+      "port": 443,
+      "uuid": "4fd83f39-a320-0001-a08c-20d8b367e275",
+      "method": "vless",
+      "protocol": "tcp",
+      "xtls": "reality",
+      "sni": "qr-gen.cc",
+      "fp": "qq",
+      "flow": "xtls-rprx-vision",
+      "pbk": "6VMgXXhZdJCiOG05EyK_zTHh00kpFGrZJeZIEPgqhjY"
+    },
+    {
+      "name": "🇸🇪 Sweden",
+      "server": "192.142.23.99",
+      "port": 443,
+      "uuid": "4fd83f39-a320-0002-a08c-20d8b367e275",
+      "method": "vless",
+      "protocol": "tcp",
+      "xtls": "reality",
+      "sni": "qr-gen.cc",
+      "fp": "chrome",
+      "flow": "xtls-rprx-vision",
+      "pbk": "6VMgXXhZdJCiOG05EyK_zTHh00kpFGrZJeZIEPgqhjY"
+    },
+    {
+      "name": "🇩🇪 Germany",
+      "server": "192.142.12.89",
+      "port": 443,
+      "uuid": "4fd83f39-a320-0003-a08c-20d8b367e275",
+      "method": "vless",
+      "protocol": "tcp",
+      "xtls": "reality",
+      "sni": "qr-gen.cc",
+      "fp": "qq",
+      "flow": "xtls-rprx-vision",
+      "pbk": "6VMgXXhZdJCiOG05EyK_zTHh00kpFGrZJeZIEPgqhjY"
+    },
+    {
+      "name": "🇷🇺 Russia",
+      "server": "201.51.12.164",
+      "port": 8445,
+      "uuid": "4fd83f39-a320-414b-a08c-20d8b367e275",
+      "method": "vless",
+      "protocol": "tcp",
+      "xtls": "reality",
+      "sni": "apple.com",
+      "fp": "qq",
+      "flow": "xtls-rprx-vision",
+      "pbk": "EPrMDeBde65nLBoriu-4H_4-0D4Y1pLqH9m6aSys6D8"
+    },
+    {
+      "name": "🇸🇬 Singapore",
+      "server": "vpn-sg.spend.tg",
+      "port": 8443,
+      "uuid": "4fd83f39-a320-414b-a08c-20d8b367e275",
+      "method": "vless",
+      "protocol": "tcp",
+      "xtls": "reality",
+      "sni": "apple.com",
+      "fp": "qq",
+      "flow": "xtls-rprx-vision",
+      "pbk": "kt-wshmPVd-J1dlU-tsXUoGag2-oFwYQ5UafScaAfzQ"
+    },
+    {
+      "name": "🇦🇪 Dubai",
+      "server": "185.253.116.18",
+      "port": 8443,
+      "uuid": "4fd83f39-a320-414b-a08c-20d8b367e275",
+      "method": "vless",
+      "protocol": "tcp",
+      "xtls": "reality",
+      "sni": "apple.com",
+      "fp": "qq",
+      "flow": "xtls-rprx-vision",
+      "pbk": "kt-wshmPVd-J1dlU-tsXUoGag2-oFwYQ5UafScaAfzQ"
+    }
+  ]
+}
