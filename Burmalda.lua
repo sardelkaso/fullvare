@@ -1,6 +1,5 @@
-
 -- =========================================================
--- BURMALDA — UAV STRIKE (Part 1/2)
+-- BURMALDA — UAV STRIKE v1.1 (Part 1/2)
 -- =========================================================
 
 local Players = game:GetService("Players")
@@ -20,12 +19,15 @@ local droneESP = {}
 local knownDrones = {}
 local notifList = {}
 local lastAimTarget = nil
+local lastDangerTime = 0
 
 local AIM_KEYWORD = "Drone"
 local AIM_MAX_DISTANCE = 1000
 local AIM_VISIBLE_DISTANCE = 5000
 local LERP_SMOOTHNESS = 1.0
 local NOTIF_MAX = 4
+local DANGER_DISTANCE = 150
+local DANGER_COOLDOWN = 2
 
 -- ЗВУКИ
 local function playSound(id, volume)
@@ -54,15 +56,15 @@ local NameFrame = Instance.new("Frame")
 NameFrame.Parent = NameGui
 NameFrame.AnchorPoint = Vector2.new(1, 0)
 NameFrame.Position = UDim2.new(1, -20, 0, 15)
-NameFrame.Size = UDim2.new(0, 320, 0, 34)
+NameFrame.Size = UDim2.new(0, 200, 0, 34)
 NameFrame.BackgroundTransparency = 1
 
 local TitleLabel = Instance.new("TextLabel")
 TitleLabel.Parent = NameFrame
 TitleLabel.BackgroundTransparency = 1
 TitleLabel.AnchorPoint = Vector2.new(1, 0)
-TitleLabel.Position = UDim2.new(1, 0, 0, 0)
-TitleLabel.Size = UDim2.new(0, 250, 0, 34)
+TitleLabel.Position = UDim2.new(1, -18, 0, 0)
+TitleLabel.Size = UDim2.new(0, 200, 0, 34)
 TitleLabel.Font = Enum.Font.GothamBlack
 TitleLabel.Text = "BURMALDA"
 TitleLabel.TextColor3 = Color3.fromRGB(0, 0, 0)
@@ -71,21 +73,10 @@ TitleLabel.TextXAlignment = Enum.TextXAlignment.Right
 TitleLabel.TextStrokeTransparency = 0
 TitleLabel.TextStrokeColor3 = Color3.fromRGB(255, 255, 255)
 
-local ShieldLabel = Instance.new("TextLabel")
-ShieldLabel.Parent = NameFrame
-ShieldLabel.BackgroundTransparency = 1
-ShieldLabel.AnchorPoint = Vector2.new(1, 0)
-ShieldLabel.Position = UDim2.new(1, -260, 0, 0)
-ShieldLabel.Size = UDim2.new(0, 30, 0, 34)
-ShieldLabel.Font = Enum.Font.GothamBlack
-ShieldLabel.Text = "🛡️"
-ShieldLabel.TextSize = 24
-ShieldLabel.TextXAlignment = Enum.TextXAlignment.Center
-
 local SafeDot = Instance.new("Frame")
 SafeDot.Parent = NameFrame
-SafeDot.AnchorPoint = Vector2.new(0, 0.5)
-SafeDot.Position = UDim2.new(1, -288, 0.5, 0)
+SafeDot.AnchorPoint = Vector2.new(1, 0.5)
+SafeDot.Position = UDim2.new(1, 0, 0.5, 0)
 SafeDot.Size = UDim2.new(0, 12, 0, 12)
 SafeDot.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
 SafeDot.BorderSizePixel = 0
@@ -328,8 +319,9 @@ end
 local function clearAllTracers()
     for p, _ in pairs(tracerElements) do removeTracer(p) end
 end
+
 -- =========================================================
--- BURMALDA — UAV STRIKE (Part 2/2)
+-- BURMALDA — UAV STRIKE v1.1 (Part 2/2)
 -- =========================================================
 
 -- ESP ДРОНОВ + AIMBOT + КИЛЛФИД
@@ -436,10 +428,11 @@ local function processDrones()
         end
     end
 
+    -- КИЛЛФИД (зелёный)
     if AIRDEF_MODE then
         for drone, _ in pairs(knownDrones) do
             if not seenNow[drone] or not drone.Parent then
-                pushNotification("ДРОН СБИТ +250 POINTS", Color3.fromRGB(255, 50, 50), 3)
+                pushNotification("ДРОН СБИТ +250 POINTS", Color3.fromRGB(0, 255, 140), 3)
                 playSound(SOUND_KILL, 0.5)
             end
         end
@@ -608,10 +601,13 @@ RunService.RenderStepped:Connect(function()
                 lastAimTarget = target
             end
 
+            -- ОПАСНО! с кулдауном
+            local now = tick()
             local distToMe = (target.Position - myChar.HumanoidRootPart.Position).Magnitude
-            if distToMe < 150 then
+            if distToMe < DANGER_DISTANCE and (now - lastDangerTime) > DANGER_COOLDOWN then
                 pushNotification("ОПАСНО! ДРОН БЛИЗКО", Color3.fromRGB(255, 60, 60), 2)
                 playSound(SOUND_DANGER, 0.4)
+                lastDangerTime = now
             end
         else
             lastAimTarget = nil
@@ -619,4 +615,4 @@ RunService.RenderStepped:Connect(function()
     end
 end)
 
-print("[BURMALDA]: Загружено. Всё активно.")
+print("[BURMALDA v1.1]: Загружено. Всё активно.")
