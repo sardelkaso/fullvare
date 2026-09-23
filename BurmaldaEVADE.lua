@@ -1,7 +1,5 @@
-
 -- =========================================================
--- BURMALDA EVADE v2.0 (Part 1/2) — UI + Movement
--- Credits: Soldix, Emerson, EzOpenSource
+-- BURMALDA EVADE v3.0 (Part 1/2) — UI Neverlose-style
 -- =========================================================
 
 local Players = game:GetService("Players")
@@ -11,6 +9,7 @@ local Lighting = game:GetService("Lighting")
 local Workspace = game:GetService("Workspace")
 local VirtualUser = game:GetService("VirtualUser")
 local TweenService = game:GetService("TweenService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local LocalPlayer = Players.LocalPlayer
 local Camera = Workspace.CurrentCamera
@@ -18,10 +17,11 @@ local Camera = Workspace.CurrentCamera
 -- ЦВЕТА (кроваво-красный акцент)
 local ACCENT       = Color3.fromRGB(200, 30, 40)
 local ACCENT_LIGHT = Color3.fromRGB(255, 60, 70)
-local ACCENT_DARK  = Color3.fromRGB(120, 15, 20)
 local BG           = Color3.fromRGB(15, 15, 20)
 local BG_PANEL     = Color3.fromRGB(22, 22, 28)
-local BG_CATEGORY  = Color3.fromRGB(28, 28, 36)
+local BG_SIDEBAR   = Color3.fromRGB(18, 18, 24)
+local BG_BUTTON    = Color3.fromRGB(28, 28, 36)
+local BG_BUTTON_HOVER = Color3.fromRGB(38, 38, 48)
 local TEXT         = Color3.fromRGB(240, 240, 245)
 local TEXT_DIM     = Color3.fromRGB(140, 140, 155)
 local STROKE       = Color3.fromRGB(50, 50, 60)
@@ -105,7 +105,7 @@ BarPing.TextSize = 14
 BarPing.TextXAlignment = Enum.TextXAlignment.Right
 
 -- =========================================================
--- ГЛАВНОЕ МЕНЮ
+-- МЕНЮ
 -- =========================================================
 local MenuGui = Instance.new("ScreenGui")
 MenuGui.Name = "BURMALDA_Menu"
@@ -119,116 +119,228 @@ local Menu = Instance.new("Frame")
 Menu.Parent = MenuGui
 Menu.AnchorPoint = Vector2.new(0.5, 0.5)
 Menu.Position = UDim2.new(0.5, 0, 0.55, 0)
-Menu.Size = UDim2.new(0, 660, 0, 400)
+Menu.Size = UDim2.new(0, 660, 0, 420)
 Menu.BackgroundColor3 = BG
 Menu.BackgroundTransparency = 0.1
 Menu.BorderSizePixel = 0
 makeCorner(Menu, 14)
 makeStroke(Menu, ACCENT, 1, 0.3)
 
--- Заголовок
-local MenuHeader = Instance.new("Frame")
-MenuHeader.Parent = Menu
-MenuHeader.Size = UDim2.new(1, 0, 0, 46)
-MenuHeader.BackgroundColor3 = BG_PANEL
-MenuHeader.BackgroundTransparency = 0.3
-MenuHeader.BorderSizePixel = 0
-makeCorner(MenuHeader, 14)
+-- =========================================================
+-- SIDEBAR (СЛЕВА) — кнопки категорий
+-- =========================================================
+local Sidebar = Instance.new("Frame")
+Sidebar.Parent = Menu
+Sidebar.Size = UDim2.new(0, 170, 1, 0)
+Sidebar.BackgroundColor3 = BG_SIDEBAR
+Sidebar.BackgroundTransparency = 0.2
+Sidebar.BorderSizePixel = 0
+makeCorner(Sidebar, 14)
 
-local HeaderFix = Instance.new("Frame")
-HeaderFix.Parent = MenuHeader
-HeaderFix.Position = UDim2.new(0, 0, 0.5, 0)
-HeaderFix.Size = UDim2.new(1, 0, 0.5, 0)
-HeaderFix.BackgroundColor3 = BG_PANEL
-HeaderFix.BackgroundTransparency = 0.3
-HeaderFix.BorderSizePixel = 0
+-- фикс правых углов sidebar (чтобы не торчали)
+local SidebarFix = Instance.new("Frame")
+SidebarFix.Parent = Sidebar
+SidebarFix.AnchorPoint = Vector2.new(1, 0)
+SidebarFix.Position = UDim2.new(1, 0, 0, 0)
+SidebarFix.Size = UDim2.new(0, 10, 1, 0)
+SidebarFix.BackgroundColor3 = BG_SIDEBAR
+SidebarFix.BackgroundTransparency = 0.2
+SidebarFix.BorderSizePixel = 0
 
-local AccentLine = Instance.new("Frame")
-AccentLine.Parent = MenuHeader
-AccentLine.Position = UDim2.new(0, 0, 1, -2)
-AccentLine.Size = UDim2.new(1, 0, 0, 2)
-AccentLine.BackgroundColor3 = ACCENT
-AccentLine.BorderSizePixel = 0
-makeGradient(AccentLine, ACCENT, ACCENT_LIGHT, 0)
+-- Заголовок в sidebar
+local SidebarTitle = Instance.new("TextLabel")
+SidebarTitle.Parent = Sidebar
+SidebarTitle.BackgroundTransparency = 1
+SidebarTitle.Position = UDim2.new(0, 16, 0, 14)
+SidebarTitle.Size = UDim2.new(1, -32, 0, 24)
+SidebarTitle.Font = Enum.Font.GothamBlack
+SidebarTitle.Text = "BURMALDA"
+SidebarTitle.TextColor3 = ACCENT_LIGHT
+SidebarTitle.TextSize = 16
+SidebarTitle.TextXAlignment = Enum.TextXAlignment.Left
 
-local MenuTitle = Instance.new("TextLabel")
-MenuTitle.Parent = MenuHeader
-MenuTitle.BackgroundTransparency = 1
-MenuTitle.Position = UDim2.new(0, 18, 0, 0)
-MenuTitle.Size = UDim2.new(1, -100, 1, 0)
-MenuTitle.Font = Enum.Font.GothamBlack
-MenuTitle.Text = "BURMALDA EVADE"
-MenuTitle.TextColor3 = TEXT
-MenuTitle.TextSize = 20
-MenuTitle.TextXAlignment = Enum.TextXAlignment.Left
+local SidebarSub = Instance.new("TextLabel")
+SidebarSub.Parent = Sidebar
+SidebarSub.BackgroundTransparency = 1
+SidebarSub.Position = UDim2.new(0, 16, 0, 36)
+SidebarSub.Size = UDim2.new(1, -32, 0, 14)
+SidebarSub.Font = Enum.Font.Gotham
+SidebarSub.Text = "EVADE  ·  v3.0"
+SidebarSub.TextColor3 = TEXT_DIM
+SidebarSub.TextSize = 11
+SidebarSub.TextXAlignment = Enum.TextXAlignment.Left
 
-local MenuSub = Instance.new("TextLabel")
-MenuSub.Parent = MenuHeader
-MenuSub.BackgroundTransparency = 1
-MenuSub.AnchorPoint = Vector2.new(1, 0.5)
-MenuSub.Position = UDim2.new(1, -18, 0.5, 0)
-MenuSub.Size = UDim2.new(0, 100, 1, 0)
-MenuSub.Font = Enum.Font.GothamBold
-MenuSub.Text = "v2.0"
-MenuSub.TextColor3 = ACCENT_LIGHT
-MenuSub.TextSize = 13
-MenuSub.TextXAlignment = Enum.TextXAlignment.Right
-
--- Контент
-local ContentFrame = Instance.new("Frame")
-ContentFrame.Parent = Menu
-ContentFrame.Position = UDim2.new(0, 15, 0, 60)
-ContentFrame.Size = UDim2.new(1, -30, 1, -75)
-ContentFrame.BackgroundTransparency = 1
-
--- Категории
-local function makeCategory(title, xOffset, width)
-    local cat = Instance.new("Frame")
-    cat.Parent = ContentFrame
-    cat.Position = UDim2.new(0, xOffset, 0, 0)
-    cat.Size = UDim2.new(0, width, 1, 0)
-    cat.BackgroundColor3 = BG_CATEGORY
-    cat.BackgroundTransparency = 0.3
-    cat.BorderSizePixel = 0
-    makeCorner(cat, 10)
-    makeStroke(cat, STROKE, 1, 0.5)
-
-    local catTitle = Instance.new("TextLabel")
-    catTitle.Parent = cat
-    catTitle.BackgroundTransparency = 1
-    catTitle.Position = UDim2.new(0, 14, 0, 8)
-    catTitle.Size = UDim2.new(1, -28, 0, 22)
-    catTitle.Font = Enum.Font.GothamBold
-    catTitle.Text = title
-    catTitle.TextColor3 = ACCENT_LIGHT
-    catTitle.TextSize = 14
-    catTitle.TextXAlignment = Enum.TextXAlignment.Left
-
-    return cat
-end
-
-local MovementCat = makeCategory("MOVEMENT", 0, 195)
-local VisualsCat  = makeCategory("VISUALS", 210, 195)
-local MiscCat     = makeCategory("MISC", 420, 195)
+-- Разделитель
+local SidebarDiv = Instance.new("Frame")
+SidebarDiv.Parent = Sidebar
+SidebarDiv.Position = UDim2.new(0, 16, 0, 58)
+SidebarDiv.Size = UDim2.new(1, -32, 0, 1)
+SidebarDiv.BackgroundColor3 = STROKE
+SidebarDiv.BackgroundTransparency = 0.3
+SidebarDiv.BorderSizePixel = 0
 
 -- =========================================================
--- TOGGLE (Neverlose style + красный акцент)
+-- КОНТЕНТ (справа)
+-- =========================================================
+local Content = Instance.new("Frame")
+Content.Parent = Menu
+Content.Position = UDim2.new(0, 185, 0, 15)
+Content.Size = UDim2.new(1, -200, 1, -30)
+Content.BackgroundTransparency = 1
+
+-- список страниц
+local pages = {}
+local categoryButtons = {}
+local activeCategory = nil
+
+local function makePage(name)
+    local page = Instance.new("ScrollingFrame")
+    page.Name = name .. "Page"
+    page.Size = UDim2.new(1, 0, 1, 0)
+    page.BackgroundTransparency = 1
+    page.BorderSizePixel = 0
+    page.ScrollBarThickness = 3
+    page.ScrollBarImageColor3 = ACCENT
+    page.Visible = false
+    page.Parent = Content
+
+    local layout = Instance.new("UIListLayout")
+    layout.SortOrder = Enum.SortOrder.LayoutOrder
+    layout.Padding = UDim.new(0, 6)
+    layout.Parent = page
+
+    local padding = Instance.new("UIPadding")
+    padding.PaddingTop = UDim.new(0, 4)
+    padding.PaddingBottom = UDim.new(0, 8)
+    padding.PaddingRight = UDim.new(0, 6)
+    padding.Parent = page
+
+    layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+        page.CanvasSize = UDim2.new(0, 0, 0, layout.AbsoluteContentSize.Y + 20)
+    end)
+
+    pages[name] = page
+    return page
+end
+
+-- =========================================================
+-- КНОПКА КАТЕГОРИИ (sidebar, Neverlose style)
+-- =========================================================
+local function makeCategoryButton(name, icon, yOffset)
+    local btn = Instance.new("TextButton")
+    btn.Name = name .. "Btn"
+    btn.Parent = Sidebar
+    btn.Position = UDim2.new(0, 12, 0, yOffset)
+    btn.Size = UDim2.new(1, -24, 0, 36)
+    btn.BackgroundColor3 = BG_BUTTON
+    btn.BackgroundTransparency = 0.2
+    btn.BorderSizePixel = 0
+    btn.AutoButtonColor = false
+    btn.Text = ""
+    makeCorner(btn, 8)
+
+    -- левая акцентная полоска (видна только при активной)
+    local bar = Instance.new("Frame")
+    bar.Parent = btn
+    bar.AnchorPoint = Vector2.new(0, 0.5)
+    bar.Position = UDim2.new(0, 0, 0.5, 0)
+    bar.Size = UDim2.new(0, 3, 0, 0)
+    bar.BackgroundColor3 = ACCENT
+    bar.BorderSizePixel = 0
+    makeCorner(bar, 2)
+
+    local label = Instance.new("TextLabel")
+    label.Parent = btn
+    label.BackgroundTransparency = 1
+    label.Position = UDim2.new(0, 14, 0, 0)
+    label.Size = UDim2.new(1, -20, 1, 0)
+    label.Font = Enum.Font.GothamBold
+    label.Text = name
+    label.TextColor3 = TEXT_DIM
+    label.TextSize = 13
+    label.TextXAlignment = Enum.TextXAlignment.Left
+
+    local stroke = Instance.new("UIStroke")
+    stroke.Color = STROKE
+    stroke.Thickness = 1
+    stroke.Transparency = 0.6
+    stroke.Parent = btn
+
+    local function selectThis()
+        -- сброс всех
+        for _, other in pairs(categoryButtons) do
+            TweenService:Create(other.Button, TweenInfo.new(0.15), {BackgroundColor3 = BG_BUTTON, BackgroundTransparency = 0.2}):Play()
+            TweenService:Create(other.Bar, TweenInfo.new(0.15), {Size = UDim2.new(0, 3, 0, 0)}):Play()
+            TweenService:Create(other.Label, TweenInfo.new(0.15), {TextColor3 = TEXT_DIM}):Play()
+            TweenService:Create(other.Stroke, TweenInfo.new(0.15), {Color = STROKE, Transparency = 0.6}):Play()
+            pages[other.Name].Visible = false
+        end
+        -- активируем нашу
+        TweenService:Create(btn, TweenInfo.new(0.15), {BackgroundColor3 = ACCENT, BackgroundTransparency = 0}):Play()
+        TweenService:Create(bar, TweenInfo.new(0.15), {Size = UDim2.new(0, 3, 0, 20)}):Play()
+        TweenService:Create(label, TweenInfo.new(0.15), {TextColor3 = Color3.fromRGB(255, 255, 255)}):Play()
+        TweenService:Create(stroke, TweenInfo.new(0.15), {Color = ACCENT_LIGHT, Transparency = 0}):Play()
+        pages[name].Visible = true
+        activeCategory = name
+    end
+
+    btn.MouseButton1Click:Connect(selectThis)
+    btn.MouseEnter:Connect(function()
+        if activeCategory ~= name then
+            TweenService:Create(btn, TweenInfo.new(0.1), {BackgroundColor3 = BG_BUTTON_HOVER}):Play()
+            TweenService:Create(label, TweenInfo.new(0.1), {TextColor3 = TEXT}):Play()
+        end
+    end)
+    btn.MouseLeave:Connect(function()
+        if activeCategory ~= name then
+            TweenService:Create(btn, TweenInfo.new(0.1), {BackgroundColor3 = BG_BUTTON}):Play()
+            TweenService:Create(label, TweenInfo.new(0.1), {TextColor3 = TEXT_DIM}):Play()
+        end
+    end)
+
+    table.insert(categoryButtons, {Button = btn, Bar = bar, Label = label, Stroke = stroke, Name = name})
+    return selectThis
+end
+
+-- страницы
+makePage("MOVEMENT")
+makePage("VISUALS")
+makePage("MISC")
+
+-- кнопки категорий
+local selectMovement = makeCategoryButton("MOVEMENT", "🚀", 80)
+local selectVisuals  = makeCategoryButton("VISUALS", "👁", 122)
+local selectMisc     = makeCategoryButton("MISC", "⚙", 164)
+
+selectMovement()
+
+-- =========================================================
+-- TOGGLE (внутри страницы)
 -- =========================================================
 local toggleStates = {}
 
-local function makeToggle(parent, label, keyName, yPos)
+local function makeToggle(parent, label, keyName)
     local holder = Instance.new("TextButton")
     holder.Parent = parent
-    holder.BackgroundTransparency = 1
-    holder.Position = UDim2.new(0, 10, 0, yPos)
-    holder.Size = UDim2.new(1, -20, 0, 32)
+    holder.BackgroundColor3 = BG_BUTTON
+    holder.BackgroundTransparency = 0.3
+    holder.BorderSizePixel = 0
+    holder.Size = UDim2.new(1, -10, 0, 36)
     holder.Text = ""
     holder.AutoButtonColor = false
+    makeCorner(holder, 8)
+
+    local holderStroke = Instance.new("UIStroke")
+    holderStroke.Color = STROKE
+    holderStroke.Thickness = 1
+    holderStroke.Transparency = 0.6
+    holderStroke.Parent = holder
 
     local labelText = Instance.new("TextLabel")
     labelText.Parent = holder
     labelText.BackgroundTransparency = 1
-    labelText.Size = UDim2.new(1, -50, 1, 0)
+    labelText.Position = UDim2.new(0, 12, 0, 0)
+    labelText.Size = UDim2.new(1, -60, 1, 0)
     labelText.Font = Enum.Font.GothamBold
     labelText.Text = label
     labelText.TextColor3 = TEXT
@@ -238,7 +350,7 @@ local function makeToggle(parent, label, keyName, yPos)
     local switchBg = Instance.new("Frame")
     switchBg.Parent = holder
     switchBg.AnchorPoint = Vector2.new(1, 0.5)
-    switchBg.Position = UDim2.new(1, 0, 0.5, 0)
+    switchBg.Position = UDim2.new(1, -12, 0.5, 0)
     switchBg.Size = UDim2.new(0, 38, 0, 20)
     switchBg.BackgroundColor3 = Color3.fromRGB(40, 40, 48)
     switchBg.BorderSizePixel = 0
@@ -283,24 +395,31 @@ local function makeToggle(parent, label, keyName, yPos)
             _G.BURMALDA_TOGGLE_CALLBACK(keyName, toggleStates[keyName])
         end
     end)
+
+    holder.MouseEnter:Connect(function()
+        TweenService:Create(holder, TweenInfo.new(0.1), {BackgroundColor3 = BG_BUTTON_HOVER}):Play()
+    end)
+    holder.MouseLeave:Connect(function()
+        TweenService:Create(holder, TweenInfo.new(0.1), {BackgroundColor3 = BG_BUTTON}):Play()
+    end)
 end
 
--- MOVEMENT
-makeToggle(MovementCat, "Noclip", "noclip", 38)
-makeToggle(MovementCat, "Fly", "fly", 74)
-makeToggle(MovementCat, "Speed (x3)", "speed", 110)
-makeToggle(MovementCat, "Bhop", "bhop", 146)
+-- MOVEMENT toggles
+makeToggle(pages["MOVEMENT"], "Noclip", "noclip")
+makeToggle(pages["MOVEMENT"], "Fly", "fly")
+makeToggle(pages["MOVEMENT"], "Speed (x1.5)", "speed")
+makeToggle(pages["MOVEMENT"], "Bhop", "bhop")
 
--- VISUALS
-makeToggle(VisualsCat, "ESP Nextbot", "esp_nextbot", 38)
-makeToggle(VisualsCat, "ESP Players", "esp_players", 74)
-makeToggle(VisualsCat, "ESP Downed", "esp_downed", 110)
-makeToggle(VisualsCat, "Tracers Downed", "tracers_downed", 146)
-makeToggle(VisualsCat, "Full Bright", "fullbright", 182)
+-- VISUALS toggles
+makeToggle(pages["VISUALS"], "ESP Nextbot", "esp_nextbot")
+makeToggle(pages["VISUALS"], "ESP Players", "esp_players")
+makeToggle(pages["VISUALS"], "ESP Downed", "esp_downed")
+makeToggle(pages["VISUALS"], "Tracers Downed", "tracers_downed")
+makeToggle(pages["VISUALS"], "Full Bright", "fullbright")
 
--- MISC
-makeToggle(MiscCat, "Auto Revive", "auto_revive", 38)
-makeToggle(MiscCat, "Anti-AFK", "anti_afk", 74)
+-- MISC toggles
+makeToggle(pages["MISC"], "Auto Revive", "auto_revive")
+makeToggle(pages["MISC"], "Anti-AFK", "anti_afk")
 
 TopBar.MouseButton1Click:Connect(function()
     MenuGui.Enabled = not MenuGui.Enabled
@@ -321,13 +440,13 @@ RunService.RenderStepped:Connect(function()
     local ping = 0
     pcall(function()
         ping = math.floor(LocalPlayer:GetNetworkPing() * 1000)
-    end)
+ end)        
     BarPing.Text = "Ping: " .. tostring(ping)
 end)
 
 _G.BURMALDA_TOGGLES = toggleStates
 -- =========================================================
--- BURMALDA EVADE v2.0 (Part 2/2) — Функции
+-- BURMALDA EVADE v3.0 (Part 2/2) — Функции
 -- =========================================================
 
 local toggles = _G.BURMALDA_TOGGLES or {}
@@ -336,15 +455,29 @@ local toggles = _G.BURMALDA_TOGGLES or {}
 -- MOVEMENT
 -- =========================================================
 
--- NOCLIP
+-- NOCLIP (переписан — жёстко каждый кадр + человеческий root)
 local noclipConn = nil
 local function startNoclip()
     if noclipConn then return end
     noclipConn = RunService.Stepped:Connect(function()
         local char = LocalPlayer.Character
         if not char then return end
+        -- отключаем коллизию у всех частей
         for _, part in ipairs(char:GetDescendants()) do
-            if part:IsA("BasePart") then part.CanCollide = false end
+            if part:IsA("BasePart") and part.CanCollide then
+                part.CanCollide = false
+            end
+        end
+        -- также отключаем у Handle если есть
+        local hum = char:FindFirstChildOfClass("Humanoid")
+        if hum then
+            for _, tool in ipairs(char:GetChildren()) do
+                if tool:IsA("Tool") then
+                    for _, p in ipairs(tool:GetDescendants()) do
+                        if p:IsA("BasePart") then p.CanCollide = false end
+                    end
+                end
+            end
         end
     end)
 end
@@ -358,17 +491,38 @@ local function stopNoclip()
     end
 end
 
--- FLY (WASD + Space/Ctrl для вертикали)
-local flying = false
+-- FLY (переписан через BodyVelocity + BodyGyro)
+local flyActive = false
+local flyBV, flyBG = nil, nil
 local flyConn = nil
+
 local function startFly()
-    if flying then return end
-    flying = true
+    if flyActive then return end
+    local char = LocalPlayer.Character
+    local hrp = char and char:FindFirstChild("HumanoidRootPart")
+    if not hrp then return end
+
+    flyActive = true
+
+    flyBV = Instance.new("BodyVelocity")
+    flyBV.Name = "BURMALDA_FlyVel"
+    flyBV.MaxForce = Vector3.new(1e5, 1e5, 1e5)
+    flyBV.Velocity = Vector3.zero
+    flyBV.Parent = hrp
+
+    flyBG = Instance.new("BodyGyro")
+    flyBG.Name = "BURMALDA_FlyGyro"
+    flyBG.MaxTorque = Vector3.new(1e5, 1e5, 1e5)
+    flyBG.P = 10000
+    flyBG.D = 100
+    flyBG.CFrame = hrp.CFrame
+    flyBG.Parent = hrp
+
     flyConn = RunService.RenderStepped:Connect(function()
-        if not flying then return end
-        local char = LocalPlayer.Character
-        local hrp = char and char:FindFirstChild("HumanoidRootPart")
-        if not hrp then return end
+        if not flyActive then return end
+        local c = LocalPlayer.Character
+        local h = c and c:FindFirstChild("HumanoidRootPart")
+        if not h or not flyBV or not flyBG then return end
 
         local moveDir = Vector3.zero
         if UserInputService:IsKeyDown(Enum.KeyCode.W) then moveDir += Camera.CFrame.LookVector end
@@ -378,66 +532,80 @@ local function startFly()
         if UserInputService:IsKeyDown(Enum.KeyCode.Space) then moveDir += Vector3.new(0, 1, 0) end
         if UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then moveDir -= Vector3.new(0, 1, 0) end
 
-        hrp.AssemblyLinearVelocity = moveDir.Magnitude > 0 and moveDir.Unit * 60 or Vector3.zero
+        flyBV.Velocity = moveDir.Magnitude > 0 and moveDir.Unit * 55 or Vector3.zero
+        flyBG.CFrame = CFrame.new(h.Position, h.Position + Camera.CFrame.LookVector)
     end)
 end
+
 local function stopFly()
-    flying = false
+    flyActive = false
     if flyConn then flyConn:Disconnect() flyConn = nil end
-    local char = LocalPlayer.Character
-    local hrp = char and char:FindFirstChild("HumanoidRootPart")
-    if hrp then hrp.AssemblyLinearVelocity = Vector3.zero end
+    if flyBV then flyBV:Destroy() flyBV = nil end
+    if flyBG then flyBG:Destroy() flyBG = nil end
 end
 
--- SPEED (x3 CFrame Boost — обходит детект)
-local cframeSpeedConn = nil
-local SPEED_MULT = 3
+-- SPEED (x1.5 — мягкий CFrame boost)
+local speedConn = nil
+local SPEED_MULT = 1.5
 local function startSpeed()
-    if cframeSpeedConn then return end
-    cframeSpeedConn = RunService.RenderStepped:Connect(function()
+    if speedConn then return end
+    speedConn = RunService.RenderStepped:Connect(function()
         local char = LocalPlayer.Character
         local hum = char and char:FindFirstChildOfClass("Humanoid")
         local hrp = char and char:FindFirstChild("HumanoidRootPart")
         if hum and hrp then
             local moveDir = hum.MoveDirection
             if moveDir.Magnitude > 0 then
-                hrp.CFrame = hrp.CFrame + moveDir * 16 * SPEED_MULT * 0.08
+                hrp.CFrame = hrp.CFrame + moveDir * 16 * (SPEED_MULT - 1) * 0.08
             end
         end
     end)
 end
 local function stopSpeed()
-    if cframeSpeedConn then cframeSpeedConn:Disconnect() cframeSpeedConn = nil end
+    if speedConn then speedConn:Disconnect() speedConn = nil end
 end
 
--- BHOP (StateChanged based — правильный, не вверх)
+-- BHOP (через JumpRequest + StateChanged — надёжно)
 local bhopConn = nil
+local bhopJumpConn = nil
 local function startBhop()
     if bhopConn then return end
     local char = LocalPlayer.Character
     local hum = char and char:FindFirstChildOfClass("Humanoid")
     if not hum then return end
+
+    -- вариант 1: StateChanged (когда приземлились — прыгаем)
     bhopConn = hum.StateChanged:Connect(function(_, newState)
-        if newState == Enum.HumanoidStateType.Landed then
+        if newState == Enum.HumanoidStateType.Landed or newState == Enum.HumanoidStateType.Running then
             if UserInputService:IsKeyDown(Enum.KeyCode.Space) then
                 hum:ChangeState(Enum.HumanoidStateType.Jumping)
             end
         end
     end)
+
+    -- вариант 2: JumpRequest (когда нажал пробел — если на земле, прыгаем)
+    bhopJumpConn = UserInputService.JumpRequest:Connect(function()
+        local c = LocalPlayer.Character
+        local h = c and c:FindFirstChildOfClass("Humanoid")
+        if h and h.FloorMaterial ~= Enum.Material.Air then
+            h:ChangeState(Enum.HumanoidStateType.Jumping)
+        end
+    end)
 end
 local function stopBhop()
     if bhopConn then bhopConn:Disconnect() bhopConn = nil end
+    if bhopJumpConn then bhopJumpConn:Disconnect() bhopJumpConn = nil end
 end
 
 -- =========================================================
 -- VISUALS
 -- =========================================================
 
-local espElements = {}  -- [character] = {Highlight, Billboard, Text}
+local espElements = {}
 local tracersDowned = {}
 
--- ESP создание
-local function createESP(target, color, labelText, yOffset, isModel)
+-- === создание ESP ===
+local function createESP(target, color, labelText, yOffset)
     if not target or not target.Parent then return end
     if espElements[target] then return end
 
@@ -460,7 +628,7 @@ local function createESP(target, color, labelText, yOffset, isModel)
     if mainPart then
         billboard = Instance.new("BillboardGui")
         billboard.Name = "BURMALDA_ESP_Text"
-        billboard.Size = UDim2.new(0, 120, 0, 30)
+        billboard.Size = UDim2.new(0, 140, 0, 30)
         billboard.AlwaysOnTop = true
         billboard.StudsOffset = Vector3.new(0, yOffset or 2, 0)
         billboard.Adornee = mainPart
@@ -474,6 +642,7 @@ local function createESP(target, color, labelText, yOffset, isModel)
         text.Text = labelText or ""
         text.TextColor3 = color
         text.TextStrokeTransparency = 0.4
+        text.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
         text.Parent = billboard
     end
 
@@ -494,9 +663,9 @@ local function clearAllESP()
     espElements = {}
 end
 
--- Обновление label дистанции
+-- === обновление дистанции ===
 RunService.Heartbeat:Connect(function()
-    for target, data in pairs(espElements) do
+    for _, data in pairs(espElements) do
         if data.Text and data.Billboard and data.Billboard.Parent and data.BaseText then
             local basePart = data.Billboard.Adornee
             if basePart then
@@ -507,13 +676,44 @@ RunService.Heartbeat:Connect(function()
     end
 end)
 
--- Downed detection (по атрибуту Downed)
-local function isDowned(character)
-    if not character or not character.Parent then return false end
-    return character:GetAttribute("Downed") == true
+-- === определение некстбота (универсально) ===
+local function isNextbot(obj)
+    if not obj or not obj.Parent then return false end
+    if not obj:IsA("Model") then return false end
+    if Players:GetPlayerFromCharacter(obj) then return false end
+    -- есть Hitbox (в Evade у ботов так)
+    if obj:FindFirstChild("Hitbox") then return true end
+    -- есть Humanoid и НЕ игрок
+    local hum = obj:FindFirstChildWhichIsA("Humanoid")
+    if hum and not Players:GetPlayerFromCharacter(obj) then
+        -- отсекаем NPC-некстботов без Health = 0
+        if hum.Health > 0 or hum.Health == 0 then
+            return true
+        end
+    end
+    -- есть HumanoidRootPart без игрока
+    if obj:FindFirstChild("HumanoidRootPart") and not Players:GetPlayerFromCharacter(obj) then
+        return true
+    end
+    return false
 end
 
--- TRACERS (для downed)
+-- === определение downed ===
+local function isDowned(character)
+    if not character or not character.Parent then return false end
+    -- 1. атрибут Downed (если есть)
+    if character:GetAttribute("Downed") == true then return true end
+    -- 2. Humanoid.Sit (в Evade упавший сидит)
+    local hum = character:FindFirstChildOfClass("Humanoid")
+    if hum then
+        if hum.Sit then return true end
+        -- 3. PlatformStand
+        if hum.PlatformStand then return true end
+    end
+    return false
+end
+
+-- === TRACERS ===
 local TracerGui = Instance.new("ScreenGui")
 TracerGui.Name = "BURMALDA_Tracers"
 TracerGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
@@ -536,7 +736,7 @@ local function removeTracerLine(line)
     if line and line.Parent then line:Destroy() end
 end
 
--- FULL BRIGHT
+-- === FULL BRIGHT ===
 local fbBackup = {}
 local function enableFullBright()
     fbBackup.Brightness = Lighting.Brightness
@@ -566,16 +766,42 @@ end
 -- MISC
 -- =========================================================
 
--- AUTO REVIVE (реальный, через SetPlayerMode)
+-- AUTO REVIVE (универсальный поиск RemoteEvent)
 local autoReviveConn = nil
+local reviveEvents = {}
+local reviveCacheTime = 0
+
+local function scanReviveEvents()
+    reviveEvents = {}
+    local rs = ReplicatedStorage
+    for _, obj in ipairs(rs:GetDescendants()) do
+        if obj:IsA("RemoteEvent") then
+            local n = obj.Name:lower()
+            if string.find(n, "revive") or string.find(n, "respawn") or string.find(n, "setplayermode") or string.find(n, "changemode") then
+                table.insert(reviveEvents, obj)
+            end
+        end
+    end
+end
+
 local function startAutoRevive()
     if autoReviveConn then return end
+    scanReviveEvents()
+    reviveCacheTime = tick()
     autoReviveConn = RunService.Heartbeat:Connect(function()
         local char = LocalPlayer.Character
-        if char and char:GetAttribute("Downed") == true then
-            pcall(function()
-                game:GetService("ReplicatedStorage").Events.SetPlayerMode:FireServer(true)
-            end)
+        if not char then return end
+        if char:GetAttribute("Downed") == true then
+            for _, ev in ipairs(reviveEvents) do
+                if ev and ev.Parent then
+                    pcall(function() ev:FireServer(true) end)
+                end
+            end
+        end
+        -- обновляем список раз в 30 сек
+        if tick() - reviveCacheTime > 30 then
+            scanReviveEvents()
+            reviveCacheTime = tick()
         end
     end)
 end
@@ -588,9 +814,11 @@ local antiAfkConn = nil
 local function startAntiAfk()
     if antiAfkConn then return end
     antiAfkConn = LocalPlayer.Idled:Connect(function()
-        VirtualUser:Button2Down(Vector2.new(0, 0), Camera.CFrame)
-        task.wait(1)
-        VirtualUser:Button2Up(Vector2.new(0, 0), Camera.CFrame)
+        pcall(function()
+            VirtualUser:Button2Down(Vector2.new(0, 0), Camera.CFrame)
+            task.wait(1)
+            VirtualUser:Button2Up(Vector2.new(0, 0), Camera.CFrame)
+        end)
     end)
 end
 local function stopAntiAfk()
@@ -622,22 +850,27 @@ end
 -- ГЛАВНЫЙ ЦИКЛ (ESP + Tracers)
 -- =========================================================
 RunService.RenderStepped:Connect(function()
-    -- ESP NEXTOBOT
+    -- ESP NEXTBOT (универсальный поиск по workspace)
     if toggles.esp_nextbot then
-        local botsFolder = Workspace:FindFirstChild("Game") and Workspace.Game:FindFirstChild("Players")
-        if botsFolder then
-            for _, bot in ipairs(botsFolder:GetChildren()) do
-                if bot:IsA("Model") and bot:FindFirstChild("Hitbox") then
-                    bot.Hitbox.Transparency = 0.5
-                    createESP(bot, Color3.fromRGB(220, 40, 50), bot.Name, -2)
-                end
+        for _, obj in ipairs(Workspace:GetDescendants()) do
+            if isNextbot(obj) then
+                -- видимая подсветка Hitbox (если есть)
+                local hitbox = obj:FindFirstChild("Hitbox")
+                if hitbox then hitbox.Transparency = 0.4 end
+                createESP(obj, Color3.fromRGB(220, 40, 50), obj.Name, -1)
+            end
+        end
+        -- чистка тех, кто исчез
+        for target, _ in pairs(espElements) do
+            if target:IsA("Model") and isNextbot(target) and not target.Parent then
+                removeESP(target)
             end
         end
     else
-        -- чистка некстботов
         for target, _ in pairs(espElements) do
-            if target:IsA("Model") and target:FindFirstChild("Hitbox") then
-                target.Hitbox.Transparency = 1
+            if target:IsA("Model") and isNextbot(target) then
+                local hitbox = target:FindFirstChild("Hitbox")
+                if hitbox then hitbox.Transparency = 1 end
                 removeESP(target)
             end
         end
@@ -656,7 +889,9 @@ RunService.RenderStepped:Connect(function()
     else
         for _, player in ipairs(Players:GetPlayers()) do
             if player ~= LocalPlayer and player.Character then
-                if espElements[player.Character] then removeESP(player.Character) end
+                if espElements[player.Character] and player.Character:GetAttribute("Downed") ~= true then
+                    removeESP(player.Character)
+                end
             end
         end
     end
@@ -718,7 +953,7 @@ RunService.RenderStepped:Connect(function()
     end
 end)
 
--- Автозапуск Anti-AFK при старте
+-- Автозапуск Anti-AFK
 startAntiAfk()
 
-print("[BURMALDA EVADE v2.0]: Загружено. Красный акцент, всё активно.")
+print("[BURMALDA EVADE v3.0]: Загружено.")
