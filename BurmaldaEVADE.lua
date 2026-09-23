@@ -1,6 +1,8 @@
 -- =========================================================
--- BURMALDA EVADE v3.0 (Part 1/2) — UI Neverlose-style
+-- BURMALDA EVADE v3.1 (Part 1/3) — UI
 -- =========================================================
+
+repeat task.wait() until game:IsLoaded()
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -14,22 +16,21 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local LocalPlayer = Players.LocalPlayer
 local Camera = Workspace.CurrentCamera
 
--- ЦВЕТА (кроваво-красный акцент)
-local ACCENT       = Color3.fromRGB(200, 30, 40)
-local ACCENT_LIGHT = Color3.fromRGB(255, 60, 70)
-local BG           = Color3.fromRGB(15, 15, 20)
-local BG_PANEL     = Color3.fromRGB(22, 22, 28)
-local BG_SIDEBAR   = Color3.fromRGB(18, 18, 24)
-local BG_BUTTON    = Color3.fromRGB(28, 28, 36)
+local ACCENT          = Color3.fromRGB(200, 30, 40)
+local ACCENT_LIGHT    = Color3.fromRGB(255, 60, 70)
+local BG              = Color3.fromRGB(15, 15, 20)
+local BG_SIDEBAR      = Color3.fromRGB(18, 18, 24)
+local BG_BUTTON       = Color3.fromRGB(28, 28, 36)
 local BG_BUTTON_HOVER = Color3.fromRGB(38, 38, 48)
-local TEXT         = Color3.fromRGB(240, 240, 245)
-local TEXT_DIM     = Color3.fromRGB(140, 140, 155)
-local STROKE       = Color3.fromRGB(50, 50, 60)
+local TEXT            = Color3.fromRGB(240, 240, 245)
+local TEXT_DIM        = Color3.fromRGB(140, 140, 155)
+local STROKE          = Color3.fromRGB(50, 50, 60)
 
 local function makeCorner(p, r)
     local c = Instance.new("UICorner")
     c.CornerRadius = UDim.new(0, r or 8)
     c.Parent = p
+    return c
 end
 
 local function makeStroke(p, col, th, tr)
@@ -39,6 +40,7 @@ local function makeStroke(p, col, th, tr)
     s.Transparency = tr or 0.4
     s.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
     s.Parent = p
+    return s
 end
 
 local function makeGradient(p, c1, c2, rot)
@@ -46,11 +48,10 @@ local function makeGradient(p, c1, c2, rot)
     g.Color = ColorSequence.new(c1, c2)
     g.Rotation = rot or 0
     g.Parent = p
+    return g
 end
 
--- =========================================================
--- ВЕРХНЯЯ ПАНЕЛЬ (BURMALDA EVADE | FPS | Ping)
--- =========================================================
+-- ВЕРХНЯЯ ПАНЕЛЬ
 local TopGui = Instance.new("ScreenGui")
 TopGui.Name = "BURMALDA_TopBar"
 TopGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
@@ -104,9 +105,7 @@ BarPing.TextColor3 = TEXT
 BarPing.TextSize = 14
 BarPing.TextXAlignment = Enum.TextXAlignment.Right
 
--- =========================================================
 -- МЕНЮ
--- =========================================================
 local MenuGui = Instance.new("ScreenGui")
 MenuGui.Name = "BURMALDA_Menu"
 MenuGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
@@ -126,9 +125,7 @@ Menu.BorderSizePixel = 0
 makeCorner(Menu, 14)
 makeStroke(Menu, ACCENT, 1, 0.3)
 
--- =========================================================
--- SIDEBAR (СЛЕВА) — кнопки категорий
--- =========================================================
+-- SIDEBAR
 local Sidebar = Instance.new("Frame")
 Sidebar.Parent = Menu
 Sidebar.Size = UDim2.new(0, 170, 1, 0)
@@ -137,7 +134,6 @@ Sidebar.BackgroundTransparency = 0.2
 Sidebar.BorderSizePixel = 0
 makeCorner(Sidebar, 14)
 
--- фикс правых углов sidebar (чтобы не торчали)
 local SidebarFix = Instance.new("Frame")
 SidebarFix.Parent = Sidebar
 SidebarFix.AnchorPoint = Vector2.new(1, 0)
@@ -147,7 +143,6 @@ SidebarFix.BackgroundColor3 = BG_SIDEBAR
 SidebarFix.BackgroundTransparency = 0.2
 SidebarFix.BorderSizePixel = 0
 
--- Заголовок в sidebar
 local SidebarTitle = Instance.new("TextLabel")
 SidebarTitle.Parent = Sidebar
 SidebarTitle.BackgroundTransparency = 1
@@ -165,12 +160,11 @@ SidebarSub.BackgroundTransparency = 1
 SidebarSub.Position = UDim2.new(0, 16, 0, 36)
 SidebarSub.Size = UDim2.new(1, -32, 0, 14)
 SidebarSub.Font = Enum.Font.Gotham
-SidebarSub.Text = "EVADE  ·  v3.0"
+SidebarSub.Text = "EVADE · v3.1"
 SidebarSub.TextColor3 = TEXT_DIM
 SidebarSub.TextSize = 11
 SidebarSub.TextXAlignment = Enum.TextXAlignment.Left
 
--- Разделитель
 local SidebarDiv = Instance.new("Frame")
 SidebarDiv.Parent = Sidebar
 SidebarDiv.Position = UDim2.new(0, 16, 0, 58)
@@ -179,16 +173,13 @@ SidebarDiv.BackgroundColor3 = STROKE
 SidebarDiv.BackgroundTransparency = 0.3
 SidebarDiv.BorderSizePixel = 0
 
--- =========================================================
--- КОНТЕНТ (справа)
--- =========================================================
+-- КОНТЕНТ
 local Content = Instance.new("Frame")
 Content.Parent = Menu
 Content.Position = UDim2.new(0, 185, 0, 15)
 Content.Size = UDim2.new(1, -200, 1, -30)
 Content.BackgroundTransparency = 1
 
--- список страниц
 local pages = {}
 local categoryButtons = {}
 local activeCategory = nil
@@ -220,15 +211,10 @@ local function makePage(name)
     end)
 
     pages[name] = page
-    return page
 end
 
--- =========================================================
--- КНОПКА КАТЕГОРИИ (sidebar, Neverlose style)
--- =========================================================
-local function makeCategoryButton(name, icon, yOffset)
+local function makeCategoryButton(name, yOffset)
     local btn = Instance.new("TextButton")
-    btn.Name = name .. "Btn"
     btn.Parent = Sidebar
     btn.Position = UDim2.new(0, 12, 0, yOffset)
     btn.Size = UDim2.new(1, -24, 0, 36)
@@ -239,7 +225,6 @@ local function makeCategoryButton(name, icon, yOffset)
     btn.Text = ""
     makeCorner(btn, 8)
 
-    -- левая акцентная полоска (видна только при активной)
     local bar = Instance.new("Frame")
     bar.Parent = btn
     bar.AnchorPoint = Vector2.new(0, 0.5)
@@ -267,15 +252,13 @@ local function makeCategoryButton(name, icon, yOffset)
     stroke.Parent = btn
 
     local function selectThis()
-        -- сброс всех
-        for _, other in pairs(categoryButtons) do
+        for _, other in ipairs(categoryButtons) do
             TweenService:Create(other.Button, TweenInfo.new(0.15), {BackgroundColor3 = BG_BUTTON, BackgroundTransparency = 0.2}):Play()
             TweenService:Create(other.Bar, TweenInfo.new(0.15), {Size = UDim2.new(0, 3, 0, 0)}):Play()
             TweenService:Create(other.Label, TweenInfo.new(0.15), {TextColor3 = TEXT_DIM}):Play()
             TweenService:Create(other.Stroke, TweenInfo.new(0.15), {Color = STROKE, Transparency = 0.6}):Play()
             pages[other.Name].Visible = false
         end
-        -- активируем нашу
         TweenService:Create(btn, TweenInfo.new(0.15), {BackgroundColor3 = ACCENT, BackgroundTransparency = 0}):Play()
         TweenService:Create(bar, TweenInfo.new(0.15), {Size = UDim2.new(0, 3, 0, 20)}):Play()
         TweenService:Create(label, TweenInfo.new(0.15), {TextColor3 = Color3.fromRGB(255, 255, 255)}):Play()
@@ -302,21 +285,17 @@ local function makeCategoryButton(name, icon, yOffset)
     return selectThis
 end
 
--- страницы
 makePage("MOVEMENT")
 makePage("VISUALS")
 makePage("MISC")
 
--- кнопки категорий
-local selectMovement = makeCategoryButton("MOVEMENT", "🚀", 80)
-local selectVisuals  = makeCategoryButton("VISUALS", "👁", 122)
-local selectMisc     = makeCategoryButton("MISC", "⚙", 164)
+local selectMovement = makeCategoryButton("MOVEMENT", 80)
+local selectVisuals  = makeCategoryButton("VISUALS", 122)
+local selectMisc     = makeCategoryButton("MISC", 164)
 
 selectMovement()
 
--- =========================================================
--- TOGGLE (внутри страницы)
--- =========================================================
+-- TOGGLE
 local toggleStates = {}
 
 local function makeToggle(parent, label, keyName)
@@ -404,20 +383,17 @@ local function makeToggle(parent, label, keyName)
     end)
 end
 
--- MOVEMENT toggles
 makeToggle(pages["MOVEMENT"], "Noclip", "noclip")
 makeToggle(pages["MOVEMENT"], "Fly", "fly")
 makeToggle(pages["MOVEMENT"], "Speed (x1.5)", "speed")
 makeToggle(pages["MOVEMENT"], "Bhop", "bhop")
 
--- VISUALS toggles
 makeToggle(pages["VISUALS"], "ESP Nextbot", "esp_nextbot")
 makeToggle(pages["VISUALS"], "ESP Players", "esp_players")
 makeToggle(pages["VISUALS"], "ESP Downed", "esp_downed")
 makeToggle(pages["VISUALS"], "Tracers Downed", "tracers_downed")
 makeToggle(pages["VISUALS"], "Full Bright", "fullbright")
 
--- MISC toggles
 makeToggle(pages["MISC"], "Auto Revive", "auto_revive")
 makeToggle(pages["MISC"], "Anti-AFK", "anti_afk")
 
@@ -440,13 +416,13 @@ RunService.RenderStepped:Connect(function()
     local ping = 0
     pcall(function()
         ping = math.floor(LocalPlayer:GetNetworkPing() * 1000)
- end)        
+    end)
     BarPing.Text = "Ping: " .. tostring(ping)
 end)
 
 _G.BURMALDA_TOGGLES = toggleStates
 -- =========================================================
--- BURMALDA EVADE v3.0 (Part 2/2) — Функции
+-- BURMALDA EVADE v3.1 (Part 2/2) — Функции
 -- =========================================================
 
 local toggles = _G.BURMALDA_TOGGLES or {}
@@ -455,28 +431,15 @@ local toggles = _G.BURMALDA_TOGGLES or {}
 -- MOVEMENT
 -- =========================================================
 
--- NOCLIP (переписан — жёстко каждый кадр + человеческий root)
 local noclipConn = nil
 local function startNoclip()
     if noclipConn then return end
     noclipConn = RunService.Stepped:Connect(function()
         local char = LocalPlayer.Character
         if not char then return end
-        -- отключаем коллизию у всех частей
         for _, part in ipairs(char:GetDescendants()) do
             if part:IsA("BasePart") and part.CanCollide then
                 part.CanCollide = false
-            end
-        end
-        -- также отключаем у Handle если есть
-        local hum = char:FindFirstChildOfClass("Humanoid")
-        if hum then
-            for _, tool in ipairs(char:GetChildren()) do
-                if tool:IsA("Tool") then
-                    for _, p in ipairs(tool:GetDescendants()) do
-                        if p:IsA("BasePart") then p.CanCollide = false end
-                    end
-                end
             end
         end
     end)
@@ -491,11 +454,8 @@ local function stopNoclip()
     end
 end
 
--- FLY (переписан через BodyVelocity + BodyGyro)
 local flyActive = false
-local flyBV, flyBG = nil, nil
-local flyConn = nil
-
+local flyBV, flyBG, flyConn = nil, nil, nil
 local function startFly()
     if flyActive then return end
     local char = LocalPlayer.Character
@@ -505,13 +465,11 @@ local function startFly()
     flyActive = true
 
     flyBV = Instance.new("BodyVelocity")
-    flyBV.Name = "BURMALDA_FlyVel"
     flyBV.MaxForce = Vector3.new(1e5, 1e5, 1e5)
     flyBV.Velocity = Vector3.zero
     flyBV.Parent = hrp
 
     flyBG = Instance.new("BodyGyro")
-    flyBG.Name = "BURMALDA_FlyGyro"
     flyBG.MaxTorque = Vector3.new(1e5, 1e5, 1e5)
     flyBG.P = 10000
     flyBG.D = 100
@@ -536,7 +494,6 @@ local function startFly()
         flyBG.CFrame = CFrame.new(h.Position, h.Position + Camera.CFrame.LookVector)
     end)
 end
-
 local function stopFly()
     flyActive = false
     if flyConn then flyConn:Disconnect() flyConn = nil end
@@ -544,7 +501,6 @@ local function stopFly()
     if flyBG then flyBG:Destroy() flyBG = nil end
 end
 
--- SPEED (x1.5 — мягкий CFrame boost)
 local speedConn = nil
 local SPEED_MULT = 1.5
 local function startSpeed()
@@ -565,16 +521,13 @@ local function stopSpeed()
     if speedConn then speedConn:Disconnect() speedConn = nil end
 end
 
--- BHOP (через JumpRequest + StateChanged — надёжно)
-local bhopConn = nil
-local bhopJumpConn = nil
+local bhopConn, bhopJumpConn = nil, nil
 local function startBhop()
     if bhopConn then return end
     local char = LocalPlayer.Character
     local hum = char and char:FindFirstChildOfClass("Humanoid")
     if not hum then return end
 
-    -- вариант 1: StateChanged (когда приземлились — прыгаем)
     bhopConn = hum.StateChanged:Connect(function(_, newState)
         if newState == Enum.HumanoidStateType.Landed or newState == Enum.HumanoidStateType.Running then
             if UserInputService:IsKeyDown(Enum.KeyCode.Space) then
@@ -583,7 +536,6 @@ local function startBhop()
         end
     end)
 
-    -- вариант 2: JumpRequest (когда нажал пробел — если на земле, прыгаем)
     bhopJumpConn = UserInputService.JumpRequest:Connect(function()
         local c = LocalPlayer.Character
         local h = c and c:FindFirstChildOfClass("Humanoid")
@@ -598,13 +550,11 @@ local function stopBhop()
 end
 
 -- =========================================================
--- VISUALS
+-- ESP
 -- =========================================================
-
 local espElements = {}
 local tracersDowned = {}
 
--- === создание ESP ===
 local function createESP(target, color, labelText, yOffset)
     if not target or not target.Parent then return end
     if espElements[target] then return end
@@ -627,7 +577,6 @@ local function createESP(target, color, labelText, yOffset)
     local billboard, text
     if mainPart then
         billboard = Instance.new("BillboardGui")
-        billboard.Name = "BURMALDA_ESP_Text"
         billboard.Size = UDim2.new(0, 140, 0, 30)
         billboard.AlwaysOnTop = true
         billboard.StudsOffset = Vector3.new(0, yOffset or 2, 0)
@@ -646,7 +595,7 @@ local function createESP(target, color, labelText, yOffset)
         text.Parent = billboard
     end
 
-    espElements[target] = { Highlight = hl, Billboard = billboard, Text = text, BaseColor = color, BaseText = labelText }
+    espElements[target] = { Highlight = hl, Billboard = billboard, Text = text, BaseText = labelText }
 end
 
 local function removeESP(target)
@@ -658,12 +607,6 @@ local function removeESP(target)
     espElements[target] = nil
 end
 
-local function clearAllESP()
-    for target, _ in pairs(espElements) do removeESP(target) end
-    espElements = {}
-end
-
--- === обновление дистанции ===
 RunService.Heartbeat:Connect(function()
     for _, data in pairs(espElements) do
         if data.Text and data.Billboard and data.Billboard.Parent and data.BaseText then
@@ -676,50 +619,32 @@ RunService.Heartbeat:Connect(function()
     end
 end)
 
--- === определение некстбота (универсально) ===
 local function isNextbot(obj)
     if not obj or not obj.Parent then return false end
     if not obj:IsA("Model") then return false end
     if Players:GetPlayerFromCharacter(obj) then return false end
-    -- есть Hitbox (в Evade у ботов так)
     if obj:FindFirstChild("Hitbox") then return true end
-    -- есть Humanoid и НЕ игрок
     local hum = obj:FindFirstChildWhichIsA("Humanoid")
-    if hum and not Players:GetPlayerFromCharacter(obj) then
-        -- отсекаем NPC-некстботов без Health = 0
-        if hum.Health > 0 or hum.Health == 0 then
-            return true
-        end
-    end
-    -- есть HumanoidRootPart без игрока
-    if obj:FindFirstChild("HumanoidRootPart") and not Players:GetPlayerFromCharacter(obj) then
-        return true
-    end
+    if hum then return true end
     return false
 end
 
--- === определение downed ===
 local function isDowned(character)
     if not character or not character.Parent then return false end
-    -- 1. атрибут Downed (если есть)
     if character:GetAttribute("Downed") == true then return true end
-    -- 2. Humanoid.Sit (в Evade упавший сидит)
     local hum = character:FindFirstChildOfClass("Humanoid")
     if hum then
         if hum.Sit then return true end
-        -- 3. PlatformStand
         if hum.PlatformStand then return true end
     end
     return false
 end
 
--- === TRACERS ===
 local TracerGui = Instance.new("ScreenGui")
 TracerGui.Name = "BURMALDA_Tracers"
 TracerGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 TracerGui.ResetOnSpawn = false
 TracerGui.IgnoreGuiInset = true
-TracerGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
 local function makeTracerLine(name, color)
     local line = Instance.new("Frame")
@@ -736,7 +661,9 @@ local function removeTracerLine(line)
     if line and line.Parent then line:Destroy() end
 end
 
--- === FULL BRIGHT ===
+-- =========================================================
+-- FULL BRIGHT
+-- =========================================================
 local fbBackup = {}
 local function enableFullBright()
     fbBackup.Brightness = Lighting.Brightness
@@ -763,18 +690,15 @@ local function disableFullBright()
 end
 
 -- =========================================================
--- MISC
+-- AUTO REVIVE
 -- =========================================================
-
--- AUTO REVIVE (универсальный поиск RemoteEvent)
 local autoReviveConn = nil
 local reviveEvents = {}
 local reviveCacheTime = 0
 
 local function scanReviveEvents()
     reviveEvents = {}
-    local rs = ReplicatedStorage
-    for _, obj in ipairs(rs:GetDescendants()) do
+    for _, obj in ipairs(ReplicatedStorage:GetDescendants()) do
         if obj:IsA("RemoteEvent") then
             local n = obj.Name:lower()
             if string.find(n, "revive") or string.find(n, "respawn") or string.find(n, "setplayermode") or string.find(n, "changemode") then
@@ -798,7 +722,6 @@ local function startAutoRevive()
                 end
             end
         end
-        -- обновляем список раз в 30 сек
         if tick() - reviveCacheTime > 30 then
             scanReviveEvents()
             reviveCacheTime = tick()
@@ -809,7 +732,9 @@ local function stopAutoRevive()
     if autoReviveConn then autoReviveConn:Disconnect() autoReviveConn = nil end
 end
 
+-- =========================================================
 -- ANTI-AFK
+-- =========================================================
 local antiAfkConn = nil
 local function startAntiAfk()
     if antiAfkConn then return end
@@ -826,7 +751,7 @@ local function stopAntiAfk()
 end
 
 -- =========================================================
--- ОБРАБОТЧИК ПЕРЕКЛЮЧАТЕЛЕЙ
+-- CALLBACK
 -- =========================================================
 _G.BURMALDA_TOGGLE_CALLBACK = function(key, state)
     if key == "noclip" then
@@ -847,23 +772,16 @@ _G.BURMALDA_TOGGLE_CALLBACK = function(key, state)
 end
 
 -- =========================================================
--- ГЛАВНЫЙ ЦИКЛ (ESP + Tracers)
+-- ГЛАВНЫЙ ЦИКЛ
 -- =========================================================
 RunService.RenderStepped:Connect(function()
-    -- ESP NEXTBOT (универсальный поиск по workspace)
+    -- ESP NEXTBOT
     if toggles.esp_nextbot then
         for _, obj in ipairs(Workspace:GetDescendants()) do
             if isNextbot(obj) then
-                -- видимая подсветка Hitbox (если есть)
                 local hitbox = obj:FindFirstChild("Hitbox")
                 if hitbox then hitbox.Transparency = 0.4 end
                 createESP(obj, Color3.fromRGB(220, 40, 50), obj.Name, -1)
-            end
-        end
-        -- чистка тех, кто исчез
-        for target, _ in pairs(espElements) do
-            if target:IsA("Model") and isNextbot(target) and not target.Parent then
-                removeESP(target)
             end
         end
     else
@@ -953,7 +871,6 @@ RunService.RenderStepped:Connect(function()
     end
 end)
 
--- Автозапуск Anti-AFK
 startAntiAfk()
 
-print("[BURMALDA EVADE v3.0]: Загружено.")
+print("[BURMALDA EVADE v3.1]: Загружено.")
