@@ -1,5 +1,5 @@
 -- =========================================================
--- BURMALDA — UAV STRIKE v1.1 (Part 1/2)
+-- BURMALDA — UAV STRIKE v1.2 (Part 1/2)
 -- =========================================================
 
 local Players = game:GetService("Players")
@@ -16,20 +16,17 @@ local AIRDEF_MODE = false
 local espElements = {}
 local tracerElements = {}
 local droneESP = {}
-local knownDrones = {}
 local notifList = {}
-local lastAimTarget = nil
 local lastDangerTime = 0
 
 local AIM_KEYWORD = "Drone"
 local AIM_MAX_DISTANCE = 1000
 local AIM_VISIBLE_DISTANCE = 5000
 local LERP_SMOOTHNESS = 1.0
-local NOTIF_MAX = 4
+local NOTIF_MAX = 3
 local DANGER_DISTANCE = 150
 local DANGER_COOLDOWN = 2
 
--- ЗВУКИ
 local function playSound(id, volume)
     local s = Instance.new("Sound")
     s.SoundId = id
@@ -41,11 +38,8 @@ end
 
 local SOUND_ON     = "rbxassetid://6042053626"
 local SOUND_OFF    = "rbxassetid://6042053626"
-local SOUND_KILL   = "rbxassetid://4612383914"
-local SOUND_LOCK   = "rbxassetid://6042053626"
 local SOUND_DANGER = "rbxassetid://5149395730"
 
--- НАЗВАНИЕ + SAFE ZONE
 local NameGui = Instance.new("ScreenGui")
 NameGui.Name = "BURMALDA_Name"
 NameGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
@@ -85,7 +79,6 @@ local DotCorner = Instance.new("UICorner")
 DotCorner.CornerRadius = UDim.new(1, 0)
 DotCorner.Parent = SafeDot
 
--- КНОПКИ + POINTS
 local BtnGui = Instance.new("ScreenGui")
 BtnGui.Name = "BURMALDA_Buttons"
 BtnGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
@@ -142,7 +135,6 @@ local function trackPoints()
 end
 task.spawn(trackPoints)
 
--- УВЕДОМЛЕНИЯ
 local NotifGui = Instance.new("ScreenGui")
 NotifGui.Name = "BURMALDA_Notifs"
 NotifGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
@@ -157,18 +149,18 @@ NotifContainer.Size = UDim2.new(0, 400, 0, 300)
 NotifContainer.BackgroundTransparency = 1
 
 local function pushNotification(text, color, duration)
-    duration = duration or 3
+    duration = duration or 2
 
     local lbl = Instance.new("TextLabel")
     lbl.Parent = NotifContainer
     lbl.AnchorPoint = Vector2.new(0.5, 1)
-    lbl.Position = UDim2.new(0.5, 0, 1, -#notifList * 30)
-    lbl.Size = UDim2.new(1, 0, 0, 28)
+    lbl.Position = UDim2.new(0.5, 0, 1, -#notifList * 22)
+    lbl.Size = UDim2.new(1, 0, 0, 20)
     lbl.BackgroundTransparency = 1
     lbl.Font = Enum.Font.GothamBold
     lbl.Text = text
     lbl.TextColor3 = color or Color3.fromRGB(255, 255, 255)
-    lbl.TextSize = 20
+    lbl.TextSize = 15
     lbl.TextStrokeTransparency = 0
     lbl.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
 
@@ -180,7 +172,7 @@ local function pushNotification(text, color, duration)
     end
 
     for i, item in ipairs(notifList) do
-        item.Position = UDim2.new(0.5, 0, 1, -(#notifList - i + 1) * 30)
+        item.Position = UDim2.new(0.5, 0, 1, -(#notifList - i + 1) * 22)
     end
 
     task.delay(duration, function()
@@ -192,12 +184,11 @@ local function pushNotification(text, color, duration)
             end
         end
         for i, item in ipairs(notifList) do
-            item.Position = UDim2.new(0.5, 0, 1, -(#notifList - i + 1) * 30)
+            item.Position = UDim2.new(0.5, 0, 1, -(#notifList - i + 1) * 22)
         end
     end)
 end
 
--- НОЧЬ / ДЕНЬ
 local function applyNight()
     Lighting.ClockTime = 0
     Lighting.Brightness = 0.8
@@ -212,7 +203,6 @@ local function applyDay()
     Lighting.OutdoorAmbient = Color3.fromRGB(128, 128, 128)
 end
 
--- ПРОВЕРКА КРЫШИ
 local function isUnderRoof(character)
     local head = character:FindFirstChild("Head") or character:FindFirstChild("HumanoidRootPart")
     if not head then return true end
@@ -224,7 +214,6 @@ local function isUnderRoof(character)
     return result ~= nil
 end
 
--- АВТО-ВЫБОР ОРУЖИЯ
 local PRIORITY_WEAPONS = {"Stinger-M", "Stinger", "Jammer", "AV-47"}
 
 local function findToolByName(name)
@@ -266,7 +255,6 @@ local function autoEquip()
     end
 end
 
--- ESP ИГРОКОВ
 local function makeESP(player)
     if espElements[player] then return end
     local char = player.Character
@@ -291,7 +279,6 @@ local function clearAllESP()
     for p, _ in pairs(espElements) do removeESP(p) end
 end
 
--- TRACERS
 local TracerGui = Instance.new("ScreenGui")
 TracerGui.Name = "BURMALDA_Tracers"
 TracerGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
@@ -319,12 +306,10 @@ end
 local function clearAllTracers()
     for p, _ in pairs(tracerElements) do removeTracer(p) end
 end
-
 -- =========================================================
--- BURMALDA — UAV STRIKE v1.1 (Part 2/2)
+-- BURMALDA — UAV STRIKE v1.2 (Part 2/2)
 -- =========================================================
 
--- ESP ДРОНОВ + AIMBOT + КИЛЛФИД
 local function isDrone(obj)
     if not obj:IsA("Model") then return false end
     local n = obj.Name
@@ -392,11 +377,9 @@ local function processDrones()
 
     local closest = nil
     local closestDist = AIM_MAX_DISTANCE
-    local seenNow = {}
 
     for _, obj in pairs(workspace:GetDescendants()) do
         if isDrone(obj) then
-            seenNow[obj] = true
             local part = getDronePart(obj)
             if part then
                 local pos = part.Position
@@ -428,17 +411,6 @@ local function processDrones()
         end
     end
 
-    -- КИЛЛФИД (зелёный)
-    if AIRDEF_MODE then
-        for drone, _ in pairs(knownDrones) do
-            if not seenNow[drone] or not drone.Parent then
-                pushNotification("ДРОН СБИТ +250 POINTS", Color3.fromRGB(0, 255, 140), 3)
-                playSound(SOUND_KILL, 0.5)
-            end
-        end
-    end
-    knownDrones = seenNow
-
     for drone, _ in pairs(droneESP) do
         if not drone or not drone.Parent then removeDroneESP(drone) end
     end
@@ -446,7 +418,6 @@ local function processDrones()
     return closest
 end
 
--- ОБРАБОТЧИКИ КНОПОК
 local function turnOffAll()
     DRONE_MODE = false
     AIRDEF_MODE = false
@@ -455,13 +426,12 @@ local function turnOffAll()
     clearAllESP()
     clearAllTracers()
     clearAllDroneESP()
-    knownDrones = {}
 end
 
 DroneButton.MouseButton1Click:Connect(function()
     if AIRDEF_MODE then
         turnOffAll()
-        pushNotification("ВСЁ ВЫКЛЮЧЕНО (КОНФЛИКТ)", Color3.fromRGB(255, 180, 0), 3)
+        pushNotification("ВСЁ ВЫКЛЮЧЕНО", Color3.fromRGB(255, 180, 0))
         return
     end
 
@@ -470,13 +440,13 @@ DroneButton.MouseButton1Click:Connect(function()
     if DRONE_MODE then
         DroneButton.Text = "DRONE ✓"
         applyNight()
-        pushNotification("DRONE ON", Color3.fromRGB(0, 255, 140), 3)
+        pushNotification("DRONE ON", Color3.fromRGB(0, 255, 140))
         playSound(SOUND_ON, 0.4)
     else
         DroneButton.Text = "DRONE"
         clearAllESP()
         clearAllTracers()
-        pushNotification("DRONE OFF", Color3.fromRGB(180, 180, 180), 3)
+        pushNotification("DRONE OFF", Color3.fromRGB(180, 180, 180))
         playSound(SOUND_OFF, 0.4)
     end
 end)
@@ -484,7 +454,7 @@ end)
 AirDefButton.MouseButton1Click:Connect(function()
     if DRONE_MODE then
         turnOffAll()
-        pushNotification("ВСЁ ВЫКЛЮЧЕНО (КОНФЛИКТ)", Color3.fromRGB(255, 180, 0), 3)
+        pushNotification("ВСЁ ВЫКЛЮЧЕНО", Color3.fromRGB(255, 180, 0))
         return
     end
 
@@ -493,18 +463,16 @@ AirDefButton.MouseButton1Click:Connect(function()
     if AIRDEF_MODE then
         AirDefButton.Text = "AIRDEF ✓"
         applyDay()
-        pushNotification("AIRDEF ON", Color3.fromRGB(0, 200, 255), 3)
+        pushNotification("AIRDEF ON", Color3.fromRGB(0, 200, 255))
         playSound(SOUND_ON, 0.4)
     else
         AirDefButton.Text = "AIRDEF"
         clearAllDroneESP()
-        knownDrones = {}
-        pushNotification("AIRDEF OFF", Color3.fromRGB(180, 180, 180), 3)
+        pushNotification("AIRDEF OFF", Color3.fromRGB(180, 180, 180))
         playSound(SOUND_OFF, 0.4)
     end
 end)
 
--- ГЛАВНЫЙ ЦИКЛ
 RunService.RenderStepped:Connect(function()
     local myChar = LocalPlayer.Character
     if myChar and myChar:FindFirstChild("HumanoidRootPart") then
@@ -594,25 +562,15 @@ RunService.RenderStepped:Connect(function()
             local lookCFrame = CFrame.lookAt(camPos, target.Position)
             Camera.CFrame = Camera.CFrame:Lerp(lookCFrame, LERP_SMOOTHNESS)
 
-            if target ~= lastAimTarget then
-                local dist = (target.Position - camPos).Magnitude
-                pushNotification(string.format("ЦЕЛЬ ЗАХВАЧЕНА %dM", math.floor(dist)), Color3.fromRGB(0, 255, 140), 2)
-                playSound(SOUND_LOCK, 0.3)
-                lastAimTarget = target
-            end
-
-            -- ОПАСНО! с кулдауном
             local now = tick()
             local distToMe = (target.Position - myChar.HumanoidRootPart.Position).Magnitude
             if distToMe < DANGER_DISTANCE and (now - lastDangerTime) > DANGER_COOLDOWN then
-                pushNotification("ОПАСНО! ДРОН БЛИЗКО", Color3.fromRGB(255, 60, 60), 2)
+                pushNotification("⚠️ ДРОН БЛИЗКО", Color3.fromRGB(255, 60, 60))
                 playSound(SOUND_DANGER, 0.4)
                 lastDangerTime = now
             end
-        else
-            lastAimTarget = nil
         end
     end
 end)
 
-print("[BURMALDA v1.1]: Загружено. Всё активно.")
+print("[BURMALDA v1.2]: Загружено.")
