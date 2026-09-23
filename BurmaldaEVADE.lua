@@ -1,22 +1,30 @@
+
 -- =========================================================
--- BURMALDA EVADE v1.3 (Part 1/2) — UI + Visuals start
+-- BURMALDA EVADE v2.0 (Part 1/2) — UI + Movement
+-- Credits: Soldix, Emerson, EzOpenSource
 -- =========================================================
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 local Lighting = game:GetService("Lighting")
+local Workspace = game:GetService("Workspace")
+local VirtualUser = game:GetService("VirtualUser")
 local TweenService = game:GetService("TweenService")
 
 local LocalPlayer = Players.LocalPlayer
-local Camera = workspace.CurrentCamera
+local Camera = Workspace.CurrentCamera
 
-local ACCENT = Color3.fromRGB(70, 140, 255)
-local BG = Color3.fromRGB(18, 18, 22)
-local BG_PANEL = Color3.fromRGB(24, 24, 28)
-local BG_CATEGORY = Color3.fromRGB(30, 30, 36)
-local TEXT = Color3.fromRGB(240, 240, 245)
-local STROKE = Color3.fromRGB(50, 50, 60)
+-- ЦВЕТА (кроваво-красный акцент)
+local ACCENT       = Color3.fromRGB(200, 30, 40)
+local ACCENT_LIGHT = Color3.fromRGB(255, 60, 70)
+local ACCENT_DARK  = Color3.fromRGB(120, 15, 20)
+local BG           = Color3.fromRGB(15, 15, 20)
+local BG_PANEL     = Color3.fromRGB(22, 22, 28)
+local BG_CATEGORY  = Color3.fromRGB(28, 28, 36)
+local TEXT         = Color3.fromRGB(240, 240, 245)
+local TEXT_DIM     = Color3.fromRGB(140, 140, 155)
+local STROKE       = Color3.fromRGB(50, 50, 60)
 
 local function makeCorner(p, r)
     local c = Instance.new("UICorner")
@@ -33,7 +41,16 @@ local function makeStroke(p, col, th, tr)
     s.Parent = p
 end
 
--- ВЕРХНЯЯ ПАНЕЛЬ
+local function makeGradient(p, c1, c2, rot)
+    local g = Instance.new("UIGradient")
+    g.Color = ColorSequence.new(c1, c2)
+    g.Rotation = rot or 0
+    g.Parent = p
+end
+
+-- =========================================================
+-- ВЕРХНЯЯ ПАНЕЛЬ (BURMALDA EVADE | FPS | Ping)
+-- =========================================================
 local TopGui = Instance.new("ScreenGui")
 TopGui.Name = "BURMALDA_TopBar"
 TopGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
@@ -47,21 +64,21 @@ TopBar.AnchorPoint = Vector2.new(0.5, 0)
 TopBar.Position = UDim2.new(0.5, 0, 0, 10)
 TopBar.Size = UDim2.new(0, 380, 0, 32)
 TopBar.BackgroundColor3 = BG
-TopBar.BackgroundTransparency = 0.25
+TopBar.BackgroundTransparency = 0.2
 TopBar.BorderSizePixel = 0
 TopBar.AutoButtonColor = false
 TopBar.Text = ""
 makeCorner(TopBar, 8)
-makeStroke(TopBar, ACCENT, 1, 0.5)
+makeStroke(TopBar, ACCENT, 1, 0.3)
 
 local BarTitle = Instance.new("TextLabel")
 BarTitle.Parent = TopBar
 BarTitle.BackgroundTransparency = 1
 BarTitle.Position = UDim2.new(0, 12, 0, 0)
-BarTitle.Size = UDim2.new(0, 200, 1, 0)
+BarTitle.Size = UDim2.new(0, 220, 1, 0)
 BarTitle.Font = Enum.Font.GothamBold
 BarTitle.Text = "BURMALDA EVADE"
-BarTitle.TextColor3 = ACCENT
+BarTitle.TextColor3 = ACCENT_LIGHT
 BarTitle.TextSize = 15
 BarTitle.TextXAlignment = Enum.TextXAlignment.Left
 
@@ -87,7 +104,9 @@ BarPing.TextColor3 = TEXT
 BarPing.TextSize = 14
 BarPing.TextXAlignment = Enum.TextXAlignment.Right
 
--- МЕНЮ
+-- =========================================================
+-- ГЛАВНОЕ МЕНЮ
+-- =========================================================
 local MenuGui = Instance.new("ScreenGui")
 MenuGui.Name = "BURMALDA_Menu"
 MenuGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
@@ -100,28 +119,29 @@ local Menu = Instance.new("Frame")
 Menu.Parent = MenuGui
 Menu.AnchorPoint = Vector2.new(0.5, 0.5)
 Menu.Position = UDim2.new(0.5, 0, 0.55, 0)
-Menu.Size = UDim2.new(0, 620, 0, 360)
+Menu.Size = UDim2.new(0, 660, 0, 400)
 Menu.BackgroundColor3 = BG
-Menu.BackgroundTransparency = 0.15
+Menu.BackgroundTransparency = 0.1
 Menu.BorderSizePixel = 0
 makeCorner(Menu, 14)
-makeStroke(Menu, ACCENT, 1, 0.4)
+makeStroke(Menu, ACCENT, 1, 0.3)
 
+-- Заголовок
 local MenuHeader = Instance.new("Frame")
 MenuHeader.Parent = Menu
-MenuHeader.Size = UDim2.new(1, 0, 0, 44)
+MenuHeader.Size = UDim2.new(1, 0, 0, 46)
 MenuHeader.BackgroundColor3 = BG_PANEL
 MenuHeader.BackgroundTransparency = 0.3
 MenuHeader.BorderSizePixel = 0
 makeCorner(MenuHeader, 14)
 
-local MenuHeaderFix = Instance.new("Frame")
-MenuHeaderFix.Parent = MenuHeader
-MenuHeaderFix.Position = UDim2.new(0, 0, 0.5, 0)
-MenuHeaderFix.Size = UDim2.new(1, 0, 0.5, 0)
-MenuHeaderFix.BackgroundColor3 = BG_PANEL
-MenuHeaderFix.BackgroundTransparency = 0.3
-MenuHeaderFix.BorderSizePixel = 0
+local HeaderFix = Instance.new("Frame")
+HeaderFix.Parent = MenuHeader
+HeaderFix.Position = UDim2.new(0, 0, 0.5, 0)
+HeaderFix.Size = UDim2.new(1, 0, 0.5, 0)
+HeaderFix.BackgroundColor3 = BG_PANEL
+HeaderFix.BackgroundTransparency = 0.3
+HeaderFix.BorderSizePixel = 0
 
 local AccentLine = Instance.new("Frame")
 AccentLine.Parent = MenuHeader
@@ -129,36 +149,39 @@ AccentLine.Position = UDim2.new(0, 0, 1, -2)
 AccentLine.Size = UDim2.new(1, 0, 0, 2)
 AccentLine.BackgroundColor3 = ACCENT
 AccentLine.BorderSizePixel = 0
+makeGradient(AccentLine, ACCENT, ACCENT_LIGHT, 0)
 
 local MenuTitle = Instance.new("TextLabel")
 MenuTitle.Parent = MenuHeader
 MenuTitle.BackgroundTransparency = 1
 MenuTitle.Position = UDim2.new(0, 18, 0, 0)
-MenuTitle.Size = UDim2.new(1, -36, 1, 0)
+MenuTitle.Size = UDim2.new(1, -100, 1, 0)
 MenuTitle.Font = Enum.Font.GothamBlack
 MenuTitle.Text = "BURMALDA EVADE"
 MenuTitle.TextColor3 = TEXT
 MenuTitle.TextSize = 20
 MenuTitle.TextXAlignment = Enum.TextXAlignment.Left
 
-local MenuVersion = Instance.new("TextLabel")
-MenuVersion.Parent = MenuHeader
-MenuVersion.BackgroundTransparency = 1
-MenuVersion.AnchorPoint = Vector2.new(1, 0.5)
-MenuVersion.Position = UDim2.new(1, -18, 0.5, 0)
-MenuVersion.Size = UDim2.new(0, 100, 1, 0)
-MenuVersion.Font = Enum.Font.GothamBold
-MenuVersion.Text = "v1.3"
-MenuVersion.TextColor3 = ACCENT
-MenuVersion.TextSize = 13
-MenuVersion.TextXAlignment = Enum.TextXAlignment.Right
+local MenuSub = Instance.new("TextLabel")
+MenuSub.Parent = MenuHeader
+MenuSub.BackgroundTransparency = 1
+MenuSub.AnchorPoint = Vector2.new(1, 0.5)
+MenuSub.Position = UDim2.new(1, -18, 0.5, 0)
+MenuSub.Size = UDim2.new(0, 100, 1, 0)
+MenuSub.Font = Enum.Font.GothamBold
+MenuSub.Text = "v2.0"
+MenuSub.TextColor3 = ACCENT_LIGHT
+MenuSub.TextSize = 13
+MenuSub.TextXAlignment = Enum.TextXAlignment.Right
 
+-- Контент
 local ContentFrame = Instance.new("Frame")
 ContentFrame.Parent = Menu
-ContentFrame.Position = UDim2.new(0, 15, 0, 58)
-ContentFrame.Size = UDim2.new(1, -30, 1, -73)
+ContentFrame.Position = UDim2.new(0, 15, 0, 60)
+ContentFrame.Size = UDim2.new(1, -30, 1, -75)
 ContentFrame.BackgroundTransparency = 1
 
+-- Категории
 local function makeCategory(title, xOffset, width)
     local cat = Instance.new("Frame")
     cat.Parent = ContentFrame
@@ -177,17 +200,20 @@ local function makeCategory(title, xOffset, width)
     catTitle.Size = UDim2.new(1, -28, 0, 22)
     catTitle.Font = Enum.Font.GothamBold
     catTitle.Text = title
-    catTitle.TextColor3 = ACCENT
+    catTitle.TextColor3 = ACCENT_LIGHT
     catTitle.TextSize = 14
     catTitle.TextXAlignment = Enum.TextXAlignment.Left
 
     return cat
 end
 
-local MovementCat = makeCategory("MOVEMENT", 0, 185)
-local VisualsCat = makeCategory("VISUALS", 200, 185)
-local MiscCat = makeCategory("MISC", 400, 185)
+local MovementCat = makeCategory("MOVEMENT", 0, 195)
+local VisualsCat  = makeCategory("VISUALS", 210, 195)
+local MiscCat     = makeCategory("MISC", 420, 195)
 
+-- =========================================================
+-- TOGGLE (Neverlose style + красный акцент)
+-- =========================================================
 local toggleStates = {}
 
 local function makeToggle(parent, label, keyName, yPos)
@@ -239,9 +265,9 @@ local function makeToggle(parent, label, keyName, yPos)
         local ti = TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
         if state then
             TweenService:Create(switchBg, ti, {BackgroundColor3 = ACCENT}):Play()
-            TweenService:Create(switchStroke, ti, {Color = ACCENT, Transparency = 0}):Play()
+            TweenService:Create(switchStroke, ti, {Color = ACCENT_LIGHT, Transparency = 0}):Play()
             TweenService:Create(knob, ti, {Position = UDim2.new(0, 20, 0.5, 0)}):Play()
-            TweenService:Create(labelText, ti, {TextColor3 = ACCENT}):Play()
+            TweenService:Create(labelText, ti, {TextColor3 = ACCENT_LIGHT}):Play()
         else
             TweenService:Create(switchBg, ti, {BackgroundColor3 = Color3.fromRGB(40, 40, 48)}):Play()
             TweenService:Create(switchStroke, ti, {Color = STROKE, Transparency = 0.5}):Play()
@@ -259,24 +285,28 @@ local function makeToggle(parent, label, keyName, yPos)
     end)
 end
 
+-- MOVEMENT
 makeToggle(MovementCat, "Noclip", "noclip", 38)
 makeToggle(MovementCat, "Fly", "fly", 74)
-makeToggle(MovementCat, "Speed (×2)", "speed", 110)
+makeToggle(MovementCat, "Speed (x3)", "speed", 110)
 makeToggle(MovementCat, "Bhop", "bhop", 146)
 
+-- VISUALS
 makeToggle(VisualsCat, "ESP Nextbot", "esp_nextbot", 38)
 makeToggle(VisualsCat, "ESP Players", "esp_players", 74)
 makeToggle(VisualsCat, "ESP Downed", "esp_downed", 110)
 makeToggle(VisualsCat, "Tracers Downed", "tracers_downed", 146)
 makeToggle(VisualsCat, "Full Bright", "fullbright", 182)
 
+-- MISC
 makeToggle(MiscCat, "Auto Revive", "auto_revive", 38)
+makeToggle(MiscCat, "Anti-AFK", "anti_afk", 74)
 
 TopBar.MouseButton1Click:Connect(function()
     MenuGui.Enabled = not MenuGui.Enabled
 end)
 
-local fps = 0
+-- FPS / PING
 local frames = 0
 local lastTime = tick()
 
@@ -284,10 +314,9 @@ RunService.RenderStepped:Connect(function()
     frames = frames + 1
     local now = tick()
     if now - lastTime >= 1 then
-        fps = frames
+        BarFPS.Text = "FPS: " .. tostring(frames)
         frames = 0
         lastTime = now
-        BarFPS.Text = "FPS: " .. tostring(fps)
     end
     local ping = 0
     pcall(function()
@@ -297,66 +326,194 @@ RunService.RenderStepped:Connect(function()
 end)
 
 _G.BURMALDA_TOGGLES = toggleStates
+-- =========================================================
+-- BURMALDA EVADE v2.0 (Part 2/2) — Функции
+-- =========================================================
+
+local toggles = _G.BURMALDA_TOGGLES or {}
+
+-- =========================================================
+-- MOVEMENT
+-- =========================================================
+
+-- NOCLIP
+local noclipConn = nil
+local function startNoclip()
+    if noclipConn then return end
+    noclipConn = RunService.Stepped:Connect(function()
+        local char = LocalPlayer.Character
+        if not char then return end
+        for _, part in ipairs(char:GetDescendants()) do
+            if part:IsA("BasePart") then part.CanCollide = false end
+        end
+    end)
+end
+local function stopNoclip()
+    if noclipConn then noclipConn:Disconnect() noclipConn = nil end
+    local char = LocalPlayer.Character
+    if char then
+        for _, part in ipairs(char:GetDescendants()) do
+            if part:IsA("BasePart") then part.CanCollide = true end
+        end
+    end
+end
+
+-- FLY (WASD + Space/Ctrl для вертикали)
+local flying = false
+local flyConn = nil
+local function startFly()
+    if flying then return end
+    flying = true
+    flyConn = RunService.RenderStepped:Connect(function()
+        if not flying then return end
+        local char = LocalPlayer.Character
+        local hrp = char and char:FindFirstChild("HumanoidRootPart")
+        if not hrp then return end
+
+        local moveDir = Vector3.zero
+        if UserInputService:IsKeyDown(Enum.KeyCode.W) then moveDir += Camera.CFrame.LookVector end
+        if UserInputService:IsKeyDown(Enum.KeyCode.S) then moveDir -= Camera.CFrame.LookVector end
+        if UserInputService:IsKeyDown(Enum.KeyCode.A) then moveDir -= Camera.CFrame.RightVector end
+        if UserInputService:IsKeyDown(Enum.KeyCode.D) then moveDir += Camera.CFrame.RightVector end
+        if UserInputService:IsKeyDown(Enum.KeyCode.Space) then moveDir += Vector3.new(0, 1, 0) end
+        if UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then moveDir -= Vector3.new(0, 1, 0) end
+
+        hrp.AssemblyLinearVelocity = moveDir.Magnitude > 0 and moveDir.Unit * 60 or Vector3.zero
+    end)
+end
+local function stopFly()
+    flying = false
+    if flyConn then flyConn:Disconnect() flyConn = nil end
+    local char = LocalPlayer.Character
+    local hrp = char and char:FindFirstChild("HumanoidRootPart")
+    if hrp then hrp.AssemblyLinearVelocity = Vector3.zero end
+end
+
+-- SPEED (x3 CFrame Boost — обходит детект)
+local cframeSpeedConn = nil
+local SPEED_MULT = 3
+local function startSpeed()
+    if cframeSpeedConn then return end
+    cframeSpeedConn = RunService.RenderStepped:Connect(function()
+        local char = LocalPlayer.Character
+        local hum = char and char:FindFirstChildOfClass("Humanoid")
+        local hrp = char and char:FindFirstChild("HumanoidRootPart")
+        if hum and hrp then
+            local moveDir = hum.MoveDirection
+            if moveDir.Magnitude > 0 then
+                hrp.CFrame = hrp.CFrame + moveDir * 16 * SPEED_MULT * 0.08
+            end
+        end
+    end)
+end
+local function stopSpeed()
+    if cframeSpeedConn then cframeSpeedConn:Disconnect() cframeSpeedConn = nil end
+end
+
+-- BHOP (StateChanged based — правильный, не вверх)
+local bhopConn = nil
+local function startBhop()
+    if bhopConn then return end
+    local char = LocalPlayer.Character
+    local hum = char and char:FindFirstChildOfClass("Humanoid")
+    if not hum then return end
+    bhopConn = hum.StateChanged:Connect(function(_, newState)
+        if newState == Enum.HumanoidStateType.Landed then
+            if UserInputService:IsKeyDown(Enum.KeyCode.Space) then
+                hum:ChangeState(Enum.HumanoidStateType.Jumping)
+            end
+        end
+    end)
+end
+local function stopBhop()
+    if bhopConn then bhopConn:Disconnect() bhopConn = nil end
+end
 
 -- =========================================================
 -- VISUALS
 -- =========================================================
-local espNextbot = {}
-local espPlayers = {}
-local espDowned = {}
+
+local espElements = {}  -- [character] = {Highlight, Billboard, Text}
 local tracersDowned = {}
 
-local function isNextbot(obj)
-    if not obj or not obj.Parent then return false end
-    if not obj:IsA("Model") then return false end
-    if Players:GetPlayerFromCharacter(obj) then return false end
-    local hasHum = obj:FindFirstChildWhichIsA("Humanoid")
-    if hasHum then return false end
-    local name = obj.Name:lower()
-    if string.find(name, "nextbot") or string.find(name, "killer") or string.find(name, "bot") then
-        return true
-    end
-    for _, desc in ipairs(obj:GetDescendants()) do
-        if desc:IsA("Decal") or desc:IsA("Texture") or desc:IsA("SurfaceGui") then
-            return true
-        end
-    end
-    local hrp = obj:FindFirstChild("HumanoidRootPart")
-    if hrp and not hasHum then return true end
-    return false
-end
+-- ESP создание
+local function createESP(target, color, labelText, yOffset, isModel)
+    if not target or not target.Parent then return end
+    if espElements[target] then return end
 
-local function isDowned(character)
-    if not character or not character.Parent then return false end
-    local hum = character:FindFirstChildWhichIsA("Humanoid")
-    if not hum or hum.Health <= 0 then return false end
-    if hum.WalkSpeed <= 0.5 then return true end
-    return false
-end
-
-local function applyHighlight(target, color)
-    local existing = target:FindFirstChild("BURMALDA_HL")
-    if existing then
-        existing.FillColor = color
-        existing.OutlineColor = color
-        return existing
-    end
     local hl = Instance.new("Highlight")
-    hl.Name = "BURMALDA_HL"
+    hl.Name = "BURMALDA_ESP"
+    hl.Adornee = target
     hl.FillColor = color
     hl.FillTransparency = 0.55
     hl.OutlineColor = color
     hl.OutlineTransparency = 0
     hl.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-    hl.Adornee = target
     hl.Parent = target
+
+    local mainPart = target:FindFirstChild("Head")
+        or target:FindFirstChild("HumanoidRootPart")
+        or target:FindFirstChild("Hitbox")
+        or target:FindFirstChildWhichIsA("BasePart")
+
+    local billboard, text
+    if mainPart then
+        billboard = Instance.new("BillboardGui")
+        billboard.Name = "BURMALDA_ESP_Text"
+        billboard.Size = UDim2.new(0, 120, 0, 30)
+        billboard.AlwaysOnTop = true
+        billboard.StudsOffset = Vector3.new(0, yOffset or 2, 0)
+        billboard.Adornee = mainPart
+        billboard.Parent = mainPart
+
+        text = Instance.new("TextLabel")
+        text.Size = UDim2.new(1, 0, 1, 0)
+        text.BackgroundTransparency = 1
+        text.Font = Enum.Font.GothamBold
+        text.TextScaled = true
+        text.Text = labelText or ""
+        text.TextColor3 = color
+        text.TextStrokeTransparency = 0.4
+        text.Parent = billboard
+    end
+
+    espElements[target] = { Highlight = hl, Billboard = billboard, Text = text, BaseColor = color, BaseText = labelText }
 end
 
-local function removeHighlight(target)
-    local hl = target:FindFirstChild("BURMALDA_HL")
-    if hl then hl:Destroy() end
+local function removeESP(target)
+    local data = espElements[target]
+    if data then
+        if data.Highlight and data.Highlight.Parent then data.Highlight:Destroy() end
+        if data.Billboard and data.Billboard.Parent then data.Billboard:Destroy() end
+    end
+    espElements[target] = nil
 end
 
+local function clearAllESP()
+    for target, _ in pairs(espElements) do removeESP(target) end
+    espElements = {}
+end
+
+-- Обновление label дистанции
+RunService.Heartbeat:Connect(function()
+    for target, data in pairs(espElements) do
+        if data.Text and data.Billboard and data.Billboard.Parent and data.BaseText then
+            local basePart = data.Billboard.Adornee
+            if basePart then
+                local dist = (Camera.CFrame.Position - basePart.Position).Magnitude
+                data.Text.Text = data.BaseText .. " [" .. math.floor(dist) .. "m]"
+            end
+        end
+    end
+end)
+
+-- Downed detection (по атрибуту Downed)
+local function isDowned(character)
+    if not character or not character.Parent then return false end
+    return character:GetAttribute("Downed") == true
+end
+
+-- TRACERS (для downed)
 local TracerGui = Instance.new("ScreenGui")
 TracerGui.Name = "BURMALDA_Tracers"
 TracerGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
@@ -364,10 +521,10 @@ TracerGui.ResetOnSpawn = false
 TracerGui.IgnoreGuiInset = true
 TracerGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
-local function makeTracerLine(name)
+local function makeTracerLine(name, color)
     local line = Instance.new("Frame")
     line.Name = name
-    line.BackgroundColor3 = ACCENT
+    line.BackgroundColor3 = color or ACCENT
     line.BorderSizePixel = 0
     line.AnchorPoint = Vector2.new(0, 0.5)
     line.ZIndex = 5
@@ -379,135 +536,160 @@ local function removeTracerLine(line)
     if line and line.Parent then line:Destroy() end
 end
 
-local fullbrightWasOn = false
-local fullbrightBackup = {}
-
+-- FULL BRIGHT
+local fbBackup = {}
 local function enableFullBright()
-    fullbrightBackup.ClockTime = Lighting.ClockTime
-    fullbrightBackup.Brightness = Lighting.Brightness
-    fullbrightBackup.Ambient = Lighting.Ambient
-    fullbrightBackup.OutdoorAmbient = Lighting.OutdoorAmbient
-    fullbrightBackup.GlobalShadows = Lighting.GlobalShadows
-    fullbrightBackup.FogEnd = Lighting.FogEnd
-    fullbrightBackup.FogStart = Lighting.FogStart
+    fbBackup.Brightness = Lighting.Brightness
+    fbBackup.Ambient = Lighting.Ambient
+    fbBackup.OutdoorAmbient = Lighting.OutdoorAmbient
+    fbBackup.GlobalShadows = Lighting.GlobalShadows
+    fbBackup.FogEnd = Lighting.FogEnd
+    fbBackup.FogStart = Lighting.FogStart
 
-    Lighting.ClockTime = 12
-    Lighting.Brightness = 3
-    Lighting.Ambient = Color3.fromRGB(180, 180, 180)
-    Lighting.OutdoorAmbient = Color3.fromRGB(180, 180, 180)
+    Lighting.Brightness = 2
+    Lighting.Ambient = Color3.fromRGB(255, 255, 255)
+    Lighting.OutdoorAmbient = Color3.fromRGB(255, 255, 255)
     Lighting.GlobalShadows = false
-    Lighting.FogEnd = 100000
-    Lighting.FogStart = 0
-
-    if not Lighting:FindFirstChild("BURMALDA_FB") then
-        local cc = Instance.new("ColorCorrectionEffect")
-        cc.Name = "BURMALDA_FB"
-        cc.Brightness = 0.25
-        cc.Contrast = 0
-        cc.Saturation = 0.1
-        cc.Parent = Lighting
-    end
-    fullbrightWasOn = true
+    Lighting.FogEnd = 1e6
+    Lighting.FogStart = 999999
 end
-
 local function disableFullBright()
-    if not fullbrightWasOn then return end
-    if fullbrightBackup.ClockTime then Lighting.ClockTime = fullbrightBackup.ClockTime end
-    if fullbrightBackup.Brightness then Lighting.Brightness = fullbrightBackup.Brightness end
-    if fullbrightBackup.Ambient then Lighting.Ambient = fullbrightBackup.Ambient end
-    if fullbrightBackup.OutdoorAmbient then Lighting.OutdoorAmbient = fullbrightBackup.OutdoorAmbient end
-    if fullbrightBackup.GlobalShadows ~= nil then Lighting.GlobalShadows = fullbrightBackup.GlobalShadows end
-    if fullbrightBackup.FogEnd then Lighting.FogEnd = fullbrightBackup.FogEnd end
-    if fullbrightBackup.FogStart then Lighting.FogStart = fullbrightBackup.FogStart end
-    local cc = Lighting:FindFirstChild("BURMALDA_FB")
-    if cc then cc:Destroy() end
-    fullbrightWasOn = false
+    if fbBackup.Brightness then Lighting.Brightness = fbBackup.Brightness end
+    if fbBackup.Ambient then Lighting.Ambient = fbBackup.Ambient end
+    if fbBackup.OutdoorAmbient then Lighting.OutdoorAmbient = fbBackup.OutdoorAmbient end
+    if fbBackup.GlobalShadows ~= nil then Lighting.GlobalShadows = fbBackup.GlobalShadows end
+    if fbBackup.FogEnd then Lighting.FogEnd = fbBackup.FogEnd end
+    if fbBackup.FogStart then Lighting.FogStart = fbBackup.FogStart end
 end
 
-_G.BURMALDA_VISUAL_CALLBACK = function(key, state)
-    if key == "fullbright" then
+-- =========================================================
+-- MISC
+-- =========================================================
+
+-- AUTO REVIVE (реальный, через SetPlayerMode)
+local autoReviveConn = nil
+local function startAutoRevive()
+    if autoReviveConn then return end
+    autoReviveConn = RunService.Heartbeat:Connect(function()
+        local char = LocalPlayer.Character
+        if char and char:GetAttribute("Downed") == true then
+            pcall(function()
+                game:GetService("ReplicatedStorage").Events.SetPlayerMode:FireServer(true)
+            end)
+        end
+    end)
+end
+local function stopAutoRevive()
+    if autoReviveConn then autoReviveConn:Disconnect() autoReviveConn = nil end
+end
+
+-- ANTI-AFK
+local antiAfkConn = nil
+local function startAntiAfk()
+    if antiAfkConn then return end
+    antiAfkConn = LocalPlayer.Idled:Connect(function()
+        VirtualUser:Button2Down(Vector2.new(0, 0), Camera.CFrame)
+        task.wait(1)
+        VirtualUser:Button2Up(Vector2.new(0, 0), Camera.CFrame)
+    end)
+end
+local function stopAntiAfk()
+    if antiAfkConn then antiAfkConn:Disconnect() antiAfkConn = nil end
+end
+
+-- =========================================================
+-- ОБРАБОТЧИК ПЕРЕКЛЮЧАТЕЛЕЙ
+-- =========================================================
+_G.BURMALDA_TOGGLE_CALLBACK = function(key, state)
+    if key == "noclip" then
+        if state then startNoclip() else stopNoclip() end
+    elseif key == "fly" then
+        if state then startFly() else stopFly() end
+    elseif key == "speed" then
+        if state then startSpeed() else stopSpeed() end
+    elseif key == "bhop" then
+        if state then startBhop() else stopBhop() end
+    elseif key == "fullbright" then
         if state then enableFullBright() else disableFullBright() end
+    elseif key == "auto_revive" then
+        if state then startAutoRevive() else stopAutoRevive() end
+    elseif key == "anti_afk" then
+        if state then startAntiAfk() else stopAntiAfk() end
     end
 end
 
-local toggles = _G.BURMALDA_TOGGLES or {}
-
+-- =========================================================
+-- ГЛАВНЫЙ ЦИКЛ (ESP + Tracers)
+-- =========================================================
 RunService.RenderStepped:Connect(function()
+    -- ESP NEXTOBOT
     if toggles.esp_nextbot then
-        for _, obj in ipairs(workspace:GetDescendants()) do
-            if isNextbot(obj) then
-                applyHighlight(obj, Color3.fromRGB(255, 40, 40))
-                espNextbot[obj] = true
-            end
-        end
-        for obj, _ in pairs(espNextbot) do
-            if not obj or not obj.Parent or not isNextbot(obj) then
-                if obj and obj.Parent then removeHighlight(obj) end
-                espNextbot[obj] = nil
-            end
-        end
-    else
-        for obj, _ in pairs(espNextbot) do
-            if obj and obj.Parent then removeHighlight(obj) end
-            espNextbot[obj] = nil
-        end
-    end
-
-    if toggles.esp_players then
-        for _, player in ipairs(Players:GetPlayers()) do
-            if player ~= LocalPlayer and player.Character then
-                local hum = player.Character:FindFirstChildWhichIsA("Humanoid")
-                if hum and hum.Health > 0 then
-                    applyHighlight(player.Character, Color3.fromRGB(0, 255, 140))
-                    espPlayers[player] = true
+        local botsFolder = Workspace:FindFirstChild("Game") and Workspace.Game:FindFirstChild("Players")
+        if botsFolder then
+            for _, bot in ipairs(botsFolder:GetChildren()) do
+                if bot:IsA("Model") and bot:FindFirstChild("Hitbox") then
+                    bot.Hitbox.Transparency = 0.5
+                    createESP(bot, Color3.fromRGB(220, 40, 50), bot.Name, -2)
                 end
             end
         end
-        for player, _ in pairs(espPlayers) do
-            if not player.Parent or not player.Character then
-                if player.Character then removeHighlight(player.Character) end
-                espPlayers[player] = nil
-            end
-        end
     else
-        for player, _ in pairs(espPlayers) do
-            if player.Character then removeHighlight(player.Character) end
-            espPlayers[player] = nil
+        -- чистка некстботов
+        for target, _ in pairs(espElements) do
+            if target:IsA("Model") and target:FindFirstChild("Hitbox") then
+                target.Hitbox.Transparency = 1
+                removeESP(target)
+            end
         end
     end
 
+    -- ESP PLAYERS
+    if toggles.esp_players then
+        for _, player in ipairs(Players:GetPlayers()) do
+            if player ~= LocalPlayer and player.Character then
+                local hum = player.Character:FindFirstChildOfClass("Humanoid")
+                if hum and hum.Health > 0 then
+                    createESP(player.Character, Color3.fromRGB(60, 220, 100), player.Name, 1)
+                end
+            end
+        end
+    else
+        for _, player in ipairs(Players:GetPlayers()) do
+            if player ~= LocalPlayer and player.Character then
+                if espElements[player.Character] then removeESP(player.Character) end
+            end
+        end
+    end
+
+    -- ESP DOWNED
     if toggles.esp_downed then
         for _, player in ipairs(Players:GetPlayers()) do
-            if player ~= LocalPlayer and player.Character and isDowned(player.Character) then
-                applyHighlight(player.Character, Color3.fromRGB(255, 200, 0))
-                espDowned[player] = true
-            end
-        end
-        for player, _ in pairs(espDowned) do
-            if not player.Parent or not player.Character or not isDowned(player.Character) then
-                if player.Character then removeHighlight(player.Character) end
-                espDowned[player] = nil
+            if player ~= LocalPlayer and player.Character then
+                if isDowned(player.Character) then
+                    createESP(player.Character, Color3.fromRGB(255, 200, 0), "DOWNED " .. player.Name, 1)
+                end
             end
         end
     else
-        for player, _ in pairs(espDowned) do
-            if player.Character then removeHighlight(player.Character) end
-            espDowned[player] = nil
+        for _, player in ipairs(Players:GetPlayers()) do
+            if player ~= LocalPlayer and player.Character and isDowned(player.Character) then
+                if espElements[player.Character] then removeESP(player.Character) end
+            end
         end
     end
 
+    -- TRACERS DOWNED
     if toggles.tracers_downed then
-        local cam = workspace.CurrentCamera
-        local screenBottom = Vector2.new(cam.ViewportSize.X / 2, cam.ViewportSize.Y)
+        local screenBottom = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y)
         for _, player in ipairs(Players:GetPlayers()) do
             if player ~= LocalPlayer and player.Character and isDowned(player.Character) then
-                local hrp = player.Character:FindFirstChild("HumanoidRootPart")
+                local hrp = player.Character:FindFirstChild("HumanoidRootPart") or player.Character:FindFirstChild("Head")
                 if hrp then
                     if not tracersDowned[player] then
-                        tracersDowned[player] = makeTracerLine("Downed_" .. player.Name)
+                        tracersDowned[player] = makeTracerLine("Downed_" .. player.Name, Color3.fromRGB(255, 200, 0))
                     end
                     local line = tracersDowned[player]
-                    local screenPos, onScreen = cam:WorldToViewportPoint(hrp.Position)
+                    local screenPos, onScreen = Camera:WorldToViewportPoint(hrp.Position)
                     if onScreen and screenPos.Z > 0 then
                         local toV = Vector2.new(screenPos.X, screenPos.Y)
                         local delta = toV - screenBottom
@@ -528,12 +710,6 @@ RunService.RenderStepped:Connect(function()
                 end
             end
         end
-        for player, line in pairs(tracersDowned) do
-            if not player.Parent then
-                removeTracerLine(line)
-                tracersDowned[player] = nil
-            end
-        end
     else
         for player, line in pairs(tracersDowned) do
             removeTracerLine(line)
@@ -541,211 +717,8 @@ RunService.RenderStepped:Connect(function()
         tracersDowned = {}
     end
 end)
--- =========================================================
--- BURMALDA EVADE v1.3 (Part 2/2) — Movement + Auto Revive
--- =========================================================
 
-local toggles = _G.BURMALDA_TOGGLES or {}
+-- Автозапуск Anti-AFK при старте
+startAntiAfk()
 
--- NOCLIP
-local noclipConn = nil
-
-local function startNoclip()
-    if noclipConn then return end
-    noclipConn = RunService.Stepped:Connect(function()
-        local char = LocalPlayer.Character
-        if not char then return end
-        for _, part in ipairs(char:GetDescendants()) do
-            if part:IsA("BasePart") and part.CanCollide then
-                part.CanCollide = false
-            end
-        end
-    end)
-end
-
-local function stopNoclip()
-    if noclipConn then noclipConn:Disconnect() noclipConn = nil end
-    local char = LocalPlayer.Character
-    if char then
-        for _, part in ipairs(char:GetDescendants()) do
-            if part:IsA("BasePart") then part.CanCollide = true end
-        end
-    end
-end
-
--- SPEED (×2)
-local SPEED_MULTIPLIER = 2
-local speedBackup = nil
-local speedConn = nil
-
-local function startSpeed()
-    if speedConn then return end
-    speedConn = RunService.Heartbeat:Connect(function()
-        local char = LocalPlayer.Character
-        local hum = char and char:FindFirstChildWhichIsA("Humanoid")
-        if hum then
-            if not speedBackup then speedBackup = hum.WalkSpeed end
-            hum.WalkSpeed = speedBackup * SPEED_MULTIPLIER
-        end
-    end)
-end
-
-local function stopSpeed()
-    if speedConn then speedConn:Disconnect() speedConn = nil end
-    local char = LocalPlayer.Character
-    local hum = char and char:FindFirstChildWhichIsA("Humanoid")
-    if hum and speedBackup then hum.WalkSpeed = speedBackup end
-    speedBackup = nil
-end
-
--- BHOP
-local bhopConn = nil
-
-local function startBhop()
-    if bhopConn then return end
-    bhopConn = RunService.Heartbeat:Connect(function()
-        local char = LocalPlayer.Character
-        local hum = char and char:FindFirstChildWhichIsA("Humanoid")
-        if hum and hum.MoveDirection.Magnitude > 0 then hum.Jump = true end
-    end)
-end
-
-local function stopBhop()
-    if bhopConn then bhopConn:Disconnect() bhopConn = nil end
-end
-
--- FLY (с вертикалью)
-local flyActive = false
-local flyConn = nil
-local flyVelocity = nil
-local flyGyro = nil
-
-local function startFly()
-    if flyActive then return end
-    local char = LocalPlayer.Character
-    local hrp = char and char:FindFirstChild("HumanoidRootPart")
-    if not hrp then return end
-
-    flyActive = true
-
-    local bv = Instance.new("BodyVelocity")
-    bv.Name = "BURMALDA_FlyVelocity"
-    bv.MaxForce = Vector3.new(1e5, 1e5, 1e5)
-    bv.Velocity = Vector3.zero
-    bv.Parent = hrp
-
-    local bg = Instance.new("BodyGyro")
-    bg.Name = "BURMALDA_FlyGyro"
-    bg.MaxTorque = Vector3.new(1e5, 1e5, 1e5)
-    bg.P = 10000
-    bg.D = 100
-    bg.CFrame = hrp.CFrame
-    bg.Parent = hrp
-
-    flyVelocity = bv
-    flyGyro = bg
-
-    flyConn = RunService.RenderStepped:Connect(function()
-        local char2 = LocalPlayer.Character
-        local hrp2 = char2 and char2:FindFirstChild("HumanoidRootPart")
-        local hum = char2 and char2:FindFirstChildWhichIsA("Humanoid")
-        if not hrp2 or not flyVelocity or not flyGyro or not hum then return end
-
-        local cam = workspace.CurrentCamera
-        local moveDir = Vector3.zero
-
-        if hum.MoveDirection.Magnitude > 0 then
-            moveDir = hum.MoveDirection * 60
-        end
-
-        local jumpKey = UserInputService:IsKeyDown(Enum.KeyCode.Space)
-        local ctrlKey = UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) or UserInputService:IsKeyDown(Enum.KeyCode.C)
-        if jumpKey then moveDir = moveDir + Vector3.new(0, 60, 0) end
-        if ctrlKey then moveDir = moveDir - Vector3.new(0, 60, 0) end
-
-        flyVelocity.Velocity = moveDir
-        flyGyro.CFrame = CFrame.new(hrp2.Position, hrp2.Position + cam.CFrame.LookVector)
-    end)
-end
-
-local function stopFly()
-    flyActive = false
-    if flyConn then flyConn:Disconnect() flyConn = nil end
-    if flyVelocity then flyVelocity:Destroy() flyVelocity = nil end
-    if flyGyro then flyGyro:Destroy() flyGyro = nil end
-end
-
--- AUTO REVIVE
-local autoReviveConn = nil
-local lastReviveAttempt = 0
-
-local function startAutoRevive()
-    if autoReviveConn then return end
-    autoReviveConn = RunService.Heartbeat:Connect(function()
-        local char = LocalPlayer.Character
-        local hum = char and char:FindFirstChildWhichIsA("Humanoid")
-        if not hum then return end
-
-        if hum.WalkSpeed <= 0.5 and hum.Health > 0 then
-            local now = tick()
-            if now - lastReviveAttempt < 0.5 then return end
-            lastReviveAttempt = now
-
-            for _, obj in ipairs(LocalPlayer:GetDescendants()) do
-                if obj:IsA("TextButton") or obj:IsA("ImageButton") then
-                    local txt = (obj.Text or ""):lower()
-                    if string.find(txt, "revive") or string.find(txt, "поднять") then
-                        pcall(function() obj.MouseButton1Click:Fire() end)
-                    end
-                end
-            end
-
-            local rs = game:GetService("ReplicatedStorage")
-            local events = rs:FindFirstChild("Events")
-            if events then
-                local playerEvents = events:FindFirstChild("Player")
-                if playerEvents then
-                    for _, ev in ipairs(playerEvents:GetChildren()) do
-                        if ev:IsA("RemoteEvent") and string.find(ev.Name:lower(), "revive") then
-                            pcall(function() ev:FireServer() end)
-                        end
-                    end
-                end
-            end
-        end
-    end)
-end
-
-local function stopAutoRevive()
-    if autoReviveConn then autoReviveConn:Disconnect() autoReviveConn = nil end
-end
-
--- ОБРАБОТЧИК ПЕРЕКЛЮЧАТЕЛЕЙ
-_G.BURMALDA_TOGGLE_CALLBACK = function(key, state)
-    if key == "noclip" then
-        if state then startNoclip() else stopNoclip() end
-    elseif key == "speed" then
-        if state then startSpeed() else stopSpeed() end
-    elseif key == "bhop" then
-        if state then startBhop() else stopBhop() end
-    elseif key == "fly" then
-        if state then startFly() else stopFly() end
-    elseif key == "auto_revive" then
-        if state then startAutoRevive() else stopAutoRevive() end
-    end
-
-    if _G.BURMALDA_VISUAL_CALLBACK then
-        _G.BURMALDA_VISUAL_CALLBACK(key, state)
-    end
-end
-
--- Респавн
-LocalPlayer.CharacterAdded:Connect(function()
-    task.wait(1)
-    if toggles.noclip then startNoclip() end
-    if toggles.speed then speedBackup = nil startSpeed() end
-    if toggles.bhop then startBhop() end
-    if toggles.fly then flyActive = false startFly() end
-end)
-
-print("[BURMALDA EVADE v1.3]: Загружено. Всё активно.")
+print("[BURMALDA EVADE v2.0]: Загружено. Красный акцент, всё активно.")
