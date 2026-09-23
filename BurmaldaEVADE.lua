@@ -1,23 +1,21 @@
 -- =========================================================
--- BURMALDA EVADE (Part 1/3) — UI
+-- BURMALDA EVADE v1.3 (Part 1/2) — UI + Visuals start
 -- =========================================================
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 local Lighting = game:GetService("Lighting")
+local TweenService = game:GetService("TweenService")
 
 local LocalPlayer = Players.LocalPlayer
 local Camera = workspace.CurrentCamera
 
--- АКЦЕНТ (Neverlose голубой)
 local ACCENT = Color3.fromRGB(70, 140, 255)
-local ACCENT_DARK = Color3.fromRGB(40, 80, 160)
 local BG = Color3.fromRGB(18, 18, 22)
 local BG_PANEL = Color3.fromRGB(24, 24, 28)
 local BG_CATEGORY = Color3.fromRGB(30, 30, 36)
 local TEXT = Color3.fromRGB(240, 240, 245)
-local TEXT_DIM = Color3.fromRGB(130, 130, 140)
 local STROKE = Color3.fromRGB(50, 50, 60)
 
 local function makeCorner(p, r)
@@ -35,9 +33,7 @@ local function makeStroke(p, col, th, tr)
     s.Parent = p
 end
 
--- =========================================================
--- ВЕРХНЯЯ ПАНЕЛЬ (FPS | Ping | BURMALDA EVADE)
--- =========================================================
+-- ВЕРХНЯЯ ПАНЕЛЬ
 local TopGui = Instance.new("ScreenGui")
 TopGui.Name = "BURMALDA_TopBar"
 TopGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
@@ -46,7 +42,6 @@ TopGui.IgnoreGuiInset = true
 TopGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
 local TopBar = Instance.new("TextButton")
-TopBar.Name = "TopBar"
 TopBar.Parent = TopGui
 TopBar.AnchorPoint = Vector2.new(0.5, 0)
 TopBar.Position = UDim2.new(0.5, 0, 0, 10)
@@ -92,9 +87,7 @@ BarPing.TextColor3 = TEXT
 BarPing.TextSize = 14
 BarPing.TextXAlignment = Enum.TextXAlignment.Right
 
--- =========================================================
--- МЕНЮ (Neverlose style)
--- =========================================================
+-- МЕНЮ
 local MenuGui = Instance.new("ScreenGui")
 MenuGui.Name = "BURMALDA_Menu"
 MenuGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
@@ -104,7 +97,6 @@ MenuGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 MenuGui.Enabled = false
 
 local Menu = Instance.new("Frame")
-Menu.Name = "Menu"
 Menu.Parent = MenuGui
 Menu.AnchorPoint = Vector2.new(0.5, 0.5)
 Menu.Position = UDim2.new(0.5, 0, 0.55, 0)
@@ -115,7 +107,6 @@ Menu.BorderSizePixel = 0
 makeCorner(Menu, 14)
 makeStroke(Menu, ACCENT, 1, 0.4)
 
--- Заголовок меню
 local MenuHeader = Instance.new("Frame")
 MenuHeader.Parent = Menu
 MenuHeader.Size = UDim2.new(1, 0, 0, 44)
@@ -157,21 +148,17 @@ MenuVersion.AnchorPoint = Vector2.new(1, 0.5)
 MenuVersion.Position = UDim2.new(1, -18, 0.5, 0)
 MenuVersion.Size = UDim2.new(0, 100, 1, 0)
 MenuVersion.Font = Enum.Font.GothamBold
-MenuVersion.Text = "v1.0"
+MenuVersion.Text = "v1.3"
 MenuVersion.TextColor3 = ACCENT
 MenuVersion.TextSize = 13
 MenuVersion.TextXAlignment = Enum.TextXAlignment.Right
 
--- =========================================================
--- КАТЕГОРИИ
--- =========================================================
 local ContentFrame = Instance.new("Frame")
 ContentFrame.Parent = Menu
 ContentFrame.Position = UDim2.new(0, 15, 0, 58)
 ContentFrame.Size = UDim2.new(1, -30, 1, -73)
 ContentFrame.BackgroundTransparency = 1
 
--- функция создания категории
 local function makeCategory(title, xOffset, width)
     local cat = Instance.new("Frame")
     cat.Parent = ContentFrame
@@ -201,9 +188,6 @@ local MovementCat = makeCategory("MOVEMENT", 0, 185)
 local VisualsCat = makeCategory("VISUALS", 200, 185)
 local MiscCat = makeCategory("MISC", 400, 185)
 
--- =========================================================
--- TOGGLE (Neverlose style)
--- =========================================================
 local toggleStates = {}
 
 local function makeToggle(parent, label, keyName, yPos)
@@ -218,7 +202,6 @@ local function makeToggle(parent, label, keyName, yPos)
     local labelText = Instance.new("TextLabel")
     labelText.Parent = holder
     labelText.BackgroundTransparency = 1
-    labelText.Position = UDim2.new(0, 0, 0, 0)
     labelText.Size = UDim2.new(1, -50, 1, 0)
     labelText.Font = Enum.Font.GothamBold
     labelText.Text = label
@@ -226,7 +209,6 @@ local function makeToggle(parent, label, keyName, yPos)
     labelText.TextSize = 13
     labelText.TextXAlignment = Enum.TextXAlignment.Left
 
-    -- контейнер переключателя
     local switchBg = Instance.new("Frame")
     switchBg.Parent = holder
     switchBg.AnchorPoint = Vector2.new(1, 0.5)
@@ -254,7 +236,6 @@ local function makeToggle(parent, label, keyName, yPos)
     toggleStates[keyName] = false
 
     local function updateVisual(state)
-        local TweenService = game:GetService("TweenService")
         local ti = TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
         if state then
             TweenService:Create(switchBg, ti, {BackgroundColor3 = ACCENT}):Play()
@@ -276,36 +257,25 @@ local function makeToggle(parent, label, keyName, yPos)
             _G.BURMALDA_TOGGLE_CALLBACK(keyName, toggleStates[keyName])
         end
     end)
-
-    return holder
 end
 
--- MOVEMENT
 makeToggle(MovementCat, "Noclip", "noclip", 38)
 makeToggle(MovementCat, "Fly", "fly", 74)
 makeToggle(MovementCat, "Speed (×2)", "speed", 110)
 makeToggle(MovementCat, "Bhop", "bhop", 146)
 
--- VISUALS
 makeToggle(VisualsCat, "ESP Nextbot", "esp_nextbot", 38)
 makeToggle(VisualsCat, "ESP Players", "esp_players", 74)
 makeToggle(VisualsCat, "ESP Downed", "esp_downed", 110)
 makeToggle(VisualsCat, "Tracers Downed", "tracers_downed", 146)
 makeToggle(VisualsCat, "Full Bright", "fullbright", 182)
 
--- MISC
 makeToggle(MiscCat, "Auto Revive", "auto_revive", 38)
 
--- =========================================================
--- ОТКРЫТИЕ / ЗАКРЫТИЕ МЕНЮ
--- =========================================================
 TopBar.MouseButton1Click:Connect(function()
     MenuGui.Enabled = not MenuGui.Enabled
 end)
 
--- =========================================================
--- ОБНОВЛЕНИЕ FPS / PING
--- =========================================================
 local fps = 0
 local frames = 0
 local lastTime = tick()
@@ -319,7 +289,6 @@ RunService.RenderStepped:Connect(function()
         lastTime = now
         BarFPS.Text = "FPS: " .. tostring(fps)
     end
-
     local ping = 0
     pcall(function()
         ping = math.floor(LocalPlayer:GetNetworkPing() * 1000)
@@ -327,48 +296,44 @@ RunService.RenderStepped:Connect(function()
     BarPing.Text = "Ping: " .. tostring(ping)
 end)
 
--- сохранить toggle-стейты в _G для других частей
 _G.BURMALDA_TOGGLES = toggleStates
--- =========================================================
--- BURMALDA EVADE (Part 2/3) — Visuals
--- =========================================================
 
+-- =========================================================
+-- VISUALS
+-- =========================================================
 local espNextbot = {}
 local espPlayers = {}
 local espDowned = {}
 local tracersDowned = {}
 
--- =========================================================
--- ОПРЕДЕЛЕНИЕ NEXTBOT'ОВ И DOWNED
--- =========================================================
 local function isNextbot(obj)
     if not obj or not obj.Parent then return false end
     if not obj:IsA("Model") then return false end
-    -- Nextbot'ы обычно с Humanoid + без Player
-    local hum = obj:FindFirstChildWhichIsA("Humanoid")
-    if not hum then return false end
     if Players:GetPlayerFromCharacter(obj) then return false end
-    -- часто содержат "Nextbot" в имени, но не всегда
-    return true
+    local hasHum = obj:FindFirstChildWhichIsA("Humanoid")
+    if hasHum then return false end
+    local name = obj.Name:lower()
+    if string.find(name, "nextbot") or string.find(name, "killer") or string.find(name, "bot") then
+        return true
+    end
+    for _, desc in ipairs(obj:GetDescendants()) do
+        if desc:IsA("Decal") or desc:IsA("Texture") or desc:IsA("SurfaceGui") then
+            return true
+        end
+    end
+    local hrp = obj:FindFirstChild("HumanoidRootPart")
+    if hrp and not hasHum then return true end
+    return false
 end
 
 local function isDowned(character)
     if not character or not character.Parent then return false end
     local hum = character:FindFirstChildWhichIsA("Humanoid")
     if not hum or hum.Health <= 0 then return false end
-    -- Downed обычно = Humanoid.RootPart.Anchored или PlatformStand, либо спец-анимация
-    -- в Evade упавший игрок лежит, у него Humanoid.Sit = true или спец-состояние
-    local hrp = character:FindFirstChild("HumanoidRootPart")
-    if not hrp then return false end
-    -- эвристика: если игрок лежит (Humanoid.Sit или PlatformStand) или низко над землёй
-    if hum.Sit then return true end
-    if hum.PlatformStand then return true end
+    if hum.WalkSpeed <= 0.5 then return true end
     return false
 end
 
--- =========================================================
--- ESP: подсветка
--- =========================================================
 local function applyHighlight(target, color)
     local existing = target:FindFirstChild("BURMALDA_HL")
     if existing then
@@ -385,7 +350,6 @@ local function applyHighlight(target, color)
     hl.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
     hl.Adornee = target
     hl.Parent = target
-    return hl
 end
 
 local function removeHighlight(target)
@@ -393,9 +357,6 @@ local function removeHighlight(target)
     if hl then hl:Destroy() end
 end
 
--- =========================================================
--- ТРЕЙСЕРЫ ДО DOWNED
--- =========================================================
 local TracerGui = Instance.new("ScreenGui")
 TracerGui.Name = "BURMALDA_Tracers"
 TracerGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
@@ -418,9 +379,6 @@ local function removeTracerLine(line)
     if line and line.Parent then line:Destroy() end
 end
 
--- =========================================================
--- FULL BRIGHT
--- =========================================================
 local fullbrightWasOn = false
 local fullbrightBackup = {}
 
@@ -461,28 +419,20 @@ local function disableFullBright()
     if fullbrightBackup.GlobalShadows ~= nil then Lighting.GlobalShadows = fullbrightBackup.GlobalShadows end
     if fullbrightBackup.FogEnd then Lighting.FogEnd = fullbrightBackup.FogEnd end
     if fullbrightBackup.FogStart then Lighting.FogStart = fullbrightBackup.FogStart end
-
     local cc = Lighting:FindFirstChild("BURMALDA_FB")
     if cc then cc:Destroy() end
     fullbrightWasOn = false
 end
 
--- =========================================================
--- ОБРАБОТЧИК ВКЛЮЧЕНИЯ ФУНКЦИЙ
--- =========================================================
 _G.BURMALDA_VISUAL_CALLBACK = function(key, state)
     if key == "fullbright" then
         if state then enableFullBright() else disableFullBright() end
     end
 end
 
--- =========================================================
--- ЦИКЛ ОБНОВЛЕНИЯ VISUALS
--- =========================================================
 local toggles = _G.BURMALDA_TOGGLES or {}
 
 RunService.RenderStepped:Connect(function()
-    -- ESP NEXTBOT
     if toggles.esp_nextbot then
         for _, obj in ipairs(workspace:GetDescendants()) do
             if isNextbot(obj) then
@@ -490,7 +440,6 @@ RunService.RenderStepped:Connect(function()
                 espNextbot[obj] = true
             end
         end
-        -- чистка мёртвых
         for obj, _ in pairs(espNextbot) do
             if not obj or not obj.Parent or not isNextbot(obj) then
                 if obj and obj.Parent then removeHighlight(obj) end
@@ -504,14 +453,12 @@ RunService.RenderStepped:Connect(function()
         end
     end
 
-    -- ESP PLAYERS
     if toggles.esp_players then
         for _, player in ipairs(Players:GetPlayers()) do
             if player ~= LocalPlayer and player.Character then
-                local char = player.Character
-                local hum = char:FindFirstChildWhichIsA("Humanoid")
+                local hum = player.Character:FindFirstChildWhichIsA("Humanoid")
                 if hum and hum.Health > 0 then
-                    applyHighlight(char, Color3.fromRGB(0, 255, 140))
+                    applyHighlight(player.Character, Color3.fromRGB(0, 255, 140))
                     espPlayers[player] = true
                 end
             end
@@ -529,15 +476,11 @@ RunService.RenderStepped:Connect(function()
         end
     end
 
-    -- ESP DOWNED
     if toggles.esp_downed then
         for _, player in ipairs(Players:GetPlayers()) do
-            if player ~= LocalPlayer and player.Character then
-                local char = player.Character
-                if isDowned(char) then
-                    applyHighlight(char, Color3.fromRGB(255, 200, 0))
-                    espDowned[player] = true
-                end
+            if player ~= LocalPlayer and player.Character and isDowned(player.Character) then
+                applyHighlight(player.Character, Color3.fromRGB(255, 200, 0))
+                espDowned[player] = true
             end
         end
         for player, _ in pairs(espDowned) do
@@ -553,11 +496,9 @@ RunService.RenderStepped:Connect(function()
         end
     end
 
-    -- TRACERS DOWNED
     if toggles.tracers_downed then
         local cam = workspace.CurrentCamera
         local screenBottom = Vector2.new(cam.ViewportSize.X / 2, cam.ViewportSize.Y)
-
         for _, player in ipairs(Players:GetPlayers()) do
             if player ~= LocalPlayer and player.Character and isDowned(player.Character) then
                 local hrp = player.Character:FindFirstChild("HumanoidRootPart")
@@ -587,7 +528,6 @@ RunService.RenderStepped:Connect(function()
                 end
             end
         end
-
         for player, line in pairs(tracersDowned) do
             if not player.Parent then
                 removeTracerLine(line)
@@ -602,14 +542,12 @@ RunService.RenderStepped:Connect(function()
     end
 end)
 -- =========================================================
--- BURMALDA EVADE (Part 3/3) — Movement + Auto Revive
+-- BURMALDA EVADE v1.3 (Part 2/2) — Movement + Auto Revive
 -- =========================================================
 
 local toggles = _G.BURMALDA_TOGGLES or {}
 
--- =========================================================
 -- NOCLIP
--- =========================================================
 local noclipConn = nil
 
 local function startNoclip()
@@ -626,23 +564,16 @@ local function startNoclip()
 end
 
 local function stopNoclip()
-    if noclipConn then
-        noclipConn:Disconnect()
-        noclipConn = nil
-    end
+    if noclipConn then noclipConn:Disconnect() noclipConn = nil end
     local char = LocalPlayer.Character
     if char then
         for _, part in ipairs(char:GetDescendants()) do
-            if part:IsA("BasePart") then
-                part.CanCollide = true
-            end
+            if part:IsA("BasePart") then part.CanCollide = true end
         end
     end
 end
 
--- =========================================================
 -- SPEED (×2)
--- =========================================================
 local SPEED_MULTIPLIER = 2
 local speedBackup = nil
 local speedConn = nil
@@ -653,30 +584,21 @@ local function startSpeed()
         local char = LocalPlayer.Character
         local hum = char and char:FindFirstChildWhichIsA("Humanoid")
         if hum then
-            if not speedBackup then
-                speedBackup = hum.WalkSpeed
-            end
+            if not speedBackup then speedBackup = hum.WalkSpeed end
             hum.WalkSpeed = speedBackup * SPEED_MULTIPLIER
         end
     end)
 end
 
 local function stopSpeed()
-    if speedConn then
-        speedConn:Disconnect()
-        speedConn = nil
-    end
+    if speedConn then speedConn:Disconnect() speedConn = nil end
     local char = LocalPlayer.Character
     local hum = char and char:FindFirstChildWhichIsA("Humanoid")
-    if hum and speedBackup then
-        hum.WalkSpeed = speedBackup
-    end
+    if hum and speedBackup then hum.WalkSpeed = speedBackup end
     speedBackup = nil
 end
 
--- =========================================================
 -- BHOP
--- =========================================================
 local bhopConn = nil
 
 local function startBhop()
@@ -684,26 +606,19 @@ local function startBhop()
     bhopConn = RunService.Heartbeat:Connect(function()
         local char = LocalPlayer.Character
         local hum = char and char:FindFirstChildWhichIsA("Humanoid")
-        if hum and hum.MoveDirection.Magnitude > 0 then
-            hum.Jump = true
-        end
+        if hum and hum.MoveDirection.Magnitude > 0 then hum.Jump = true end
     end)
 end
 
 local function stopBhop()
-    if bhopConn then
-        bhopConn:Disconnect()
-        bhopConn = nil
-    end
+    if bhopConn then bhopConn:Disconnect() bhopConn = nil end
 end
 
--- =========================================================
--- FLY (Minecraft style) — активируется тумблером
--- =========================================================
+-- FLY (с вертикалью)
 local flyActive = false
 local flyConn = nil
-local flyGyro = nil
 local flyVelocity = nil
+local flyGyro = nil
 
 local function startFly()
     if flyActive then return end
@@ -713,7 +628,6 @@ local function startFly()
 
     flyActive = true
 
-    -- создаём BodyVelocity + BodyGyro
     local bv = Instance.new("BodyVelocity")
     bv.Name = "BURMALDA_FlyVelocity"
     bv.MaxForce = Vector3.new(1e5, 1e5, 1e5)
@@ -734,34 +648,20 @@ local function startFly()
     flyConn = RunService.RenderStepped:Connect(function()
         local char2 = LocalPlayer.Character
         local hrp2 = char2 and char2:FindFirstChild("HumanoidRootPart")
-        if not hrp2 or not flyVelocity or not flyGyro then return end
+        local hum = char2 and char2:FindFirstChildWhichIsA("Humanoid")
+        if not hrp2 or not flyVelocity or not flyGyro or not hum then return end
 
         local cam = workspace.CurrentCamera
         local moveDir = Vector3.zero
 
-        -- WASD через Humanoid.MoveDirection (мобильный джойстик сам даёт направление)
-        local hum = char2:FindFirstChildWhichIsA("Humanoid")
-        if hum and hum.MoveDirection.Magnitude > 0 then
+        if hum.MoveDirection.Magnitude > 0 then
             moveDir = hum.MoveDirection * 60
         end
 
-        -- вертикаль: кнопки прыжка/приседа (на телефоне через UserInputService)
-        local jumpHeld = false
-        local downHeld = false
-
-        -- проверяем состояние джойстика через HumanoidStateType (простой вариант)
-        if hum then
-            if hum:GetState() == Enum.HumanoidStateType.Jumping then
-                jumpHeld = true
-            end
-            if hum:GetState() == Enum.HumanoidStateType.Freefall then
-                jumpHeld = true
-            end
-        end
-
-        -- для мобилы удобнее: тащим за экран — летим
-        -- упрощаем: только горизонталь + фикс высота
-        moveDir = moveDir + Vector3.new(0, 0, 0)
+        local jumpKey = UserInputService:IsKeyDown(Enum.KeyCode.Space)
+        local ctrlKey = UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) or UserInputService:IsKeyDown(Enum.KeyCode.C)
+        if jumpKey then moveDir = moveDir + Vector3.new(0, 60, 0) end
+        if ctrlKey then moveDir = moveDir - Vector3.new(0, 60, 0) end
 
         flyVelocity.Velocity = moveDir
         flyGyro.CFrame = CFrame.new(hrp2.Position, hrp2.Position + cam.CFrame.LookVector)
@@ -775,10 +675,9 @@ local function stopFly()
     if flyGyro then flyGyro:Destroy() flyGyro = nil end
 end
 
--- =========================================================
 -- AUTO REVIVE
--- =========================================================
 local autoReviveConn = nil
+local lastReviveAttempt = 0
 
 local function startAutoRevive()
     if autoReviveConn then return end
@@ -787,31 +686,41 @@ local function startAutoRevive()
         local hum = char and char:FindFirstChildWhichIsA("Humanoid")
         if not hum then return end
 
-        -- Evade: поднятие через RemoteEvent. Точное имя может меняться.
-        -- Пробуем общие варианты через ReplicatedStorage.
-        local rs = game:GetService("ReplicatedStorage")
+        if hum.WalkSpeed <= 0.5 and hum.Health > 0 then
+            local now = tick()
+            if now - lastReviveAttempt < 0.5 then return end
+            lastReviveAttempt = now
 
-        -- Ищем RemoteEvent с намёком на revive
-        for _, obj in ipairs(rs:GetDescendants()) do
-            if obj:IsA("RemoteEvent") and (string.find(obj.Name:lower(), "revive") or string.find(obj.Name:lower(), "heal") or string.find(obj.Name:lower(), "respawn")) then
-                pcall(function()
-                    obj:FireServer()
-                end)
+            for _, obj in ipairs(LocalPlayer:GetDescendants()) do
+                if obj:IsA("TextButton") or obj:IsA("ImageButton") then
+                    local txt = (obj.Text or ""):lower()
+                    if string.find(txt, "revive") or string.find(txt, "поднять") then
+                        pcall(function() obj.MouseButton1Click:Fire() end)
+                    end
+                end
+            end
+
+            local rs = game:GetService("ReplicatedStorage")
+            local events = rs:FindFirstChild("Events")
+            if events then
+                local playerEvents = events:FindFirstChild("Player")
+                if playerEvents then
+                    for _, ev in ipairs(playerEvents:GetChildren()) do
+                        if ev:IsA("RemoteEvent") and string.find(ev.Name:lower(), "revive") then
+                            pcall(function() ev:FireServer() end)
+                        end
+                    end
+                end
             end
         end
     end)
 end
 
 local function stopAutoRevive()
-    if autoReviveConn then
-        autoReviveConn:Disconnect()
-        autoReviveConn = nil
-    end
+    if autoReviveConn then autoReviveConn:Disconnect() autoReviveConn = nil end
 end
 
--- =========================================================
 -- ОБРАБОТЧИК ПЕРЕКЛЮЧАТЕЛЕЙ
--- =========================================================
 _G.BURMALDA_TOGGLE_CALLBACK = function(key, state)
     if key == "noclip" then
         if state then startNoclip() else stopNoclip() end
@@ -825,13 +734,12 @@ _G.BURMALDA_TOGGLE_CALLBACK = function(key, state)
         if state then startAutoRevive() else stopAutoRevive() end
     end
 
-    -- передаём в visual callback
     if _G.BURMALDA_VISUAL_CALLBACK then
         _G.BURMALDA_VISUAL_CALLBACK(key, state)
     end
 end
 
--- ресет при смерти персонажа
+-- Респавн
 LocalPlayer.CharacterAdded:Connect(function()
     task.wait(1)
     if toggles.noclip then startNoclip() end
@@ -840,4 +748,4 @@ LocalPlayer.CharacterAdded:Connect(function()
     if toggles.fly then flyActive = false startFly() end
 end)
 
-print("[BURMALDA EVADE]: Загружено. Всё активно.")
+print("[BURMALDA EVADE v1.3]: Загружено. Всё активно.")
